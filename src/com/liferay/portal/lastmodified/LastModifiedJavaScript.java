@@ -109,8 +109,4 @@ public class LastModifiedJavaScript implements Cachable{
 	private static LastModifiedJavaScript _instance =
 		new LastModifiedJavaScript();
 
-	public void clearCache() {
-		clear();
-	}
-
 }

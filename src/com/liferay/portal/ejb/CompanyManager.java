@@ -43,10 +43,6 @@ public interface CompanyManager {
 		throws com.liferay.portal.PortalException, 
 			com.liferay.portal.SystemException, java.rmi.RemoteException;
 
-	public java.util.List getUsers()
-		throws com.liferay.portal.PortalException, 
-			com.liferay.portal.SystemException, java.rmi.RemoteException;
-
 	public com.liferay.portal.model.Company updateCompany(
 		java.lang.String portalURL, java.lang.String homeURL,
 		java.lang.String mx, java.lang.String name, java.lang.String shortName,
@@ -58,11 +54,6 @@ public interface CompanyManager {
 		throws com.liferay.portal.PortalException, 
 			com.liferay.portal.SystemException, java.rmi.RemoteException;
 
-	public void updateDefaultUser(java.lang.String languageId,
-		java.lang.String timeZoneId, java.lang.String skinId,
-		boolean dottedSkins, boolean roundedSkins, java.lang.String resolution)
-		throws com.liferay.portal.PortalException, 
-			com.liferay.portal.SystemException, java.rmi.RemoteException;
 
 	public void updateLogo(java.io.File file)
 		throws com.liferay.portal.PortalException, 

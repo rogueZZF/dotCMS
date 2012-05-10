@@ -24,10 +24,11 @@ package com.liferay.portal.ejb;
 
 import java.util.TimeZone;
 
-import com.dotmarketing.business.CacheLocator;
+import com.dotmarketing.business.APILocator;
 import com.liferay.portal.PortalException;
 import com.liferay.portal.SystemException;
 import com.liferay.portal.model.Company;
+import com.liferay.portal.model.User;
 
 /**
  * <a href="CompanyManagerUtil.java.html"><b><i>View Source</i></b></a>
@@ -64,25 +65,6 @@ public class CompanyManagerUtil {
 			CompanyManager companyManager = CompanyManagerFactory.getManager();
 
 			return companyManager.getCompany(companyId);
-		}
-		catch (com.liferay.portal.PortalException pe) {
-			throw pe;
-		}
-		catch (com.liferay.portal.SystemException se) {
-			throw se;
-		}
-		catch (Exception e) {
-			throw new com.liferay.portal.SystemException(e);
-		}
-	}
-
-	public static java.util.List getUsers()
-		throws com.liferay.portal.PortalException, 
-			com.liferay.portal.SystemException {
-		try {
-			CompanyManager companyManager = CompanyManagerFactory.getManager();
-
-			return companyManager.getUsers();
 		}
 		catch (com.liferay.portal.PortalException pe) {
 			throw pe;
@@ -133,26 +115,6 @@ public class CompanyManagerUtil {
 		}
 	}
 
-	public static void updateDefaultUser(java.lang.String languageId,
-		java.lang.String timeZoneId, java.lang.String skinId,
-		boolean dottedSkins, boolean roundedSkins, java.lang.String resolution)
-		throws com.liferay.portal.PortalException, 
-			com.liferay.portal.SystemException {
-		try {
-			CompanyManager companyManager = CompanyManagerFactory.getManager();
-			companyManager.updateDefaultUser(languageId, timeZoneId, skinId,
-				dottedSkins, roundedSkins, resolution);
-		}
-		catch (com.liferay.portal.PortalException pe) {
-			throw pe;
-		}
-		catch (com.liferay.portal.SystemException se) {
-			throw se;
-		}
-		catch (Exception e) {
-			throw new com.liferay.portal.SystemException(e);
-		}
-	}
 
 	public static void updateLogo(java.io.File file)
 		throws com.liferay.portal.PortalException, 
@@ -189,22 +151,29 @@ public class CompanyManagerUtil {
 			boolean dottedSkins, boolean roundedSkins, java.lang.String resolution)
 	throws PortalException, SystemException,com.dotmarketing.exception.DotRuntimeException {
 		try{		
-			CompanyManager companyManager = CompanyManagerFactory.getManager();
+//			CompanyManager companyManager = CompanyManagerFactory.getManager();
 			//companyManager.updateUsers(languageId, timeZoneId, skinId, dottedSkins, roundedSkins, resolution);
-			companyManager.updateDefaultUser(languageId, timeZoneId, skinId, dottedSkins, roundedSkins, resolution);
 			
+			User u = APILocator.getUserAPI().getSystemUser();
+			u.setLanguageId(languageId);
+			u.setTimeZoneId(timeZoneId);
+			u.setSkinId(skinId);
+			u.setDottedSkins(dottedSkins);
+			u.setRoundedSkins(roundedSkins);
+			u.setResolution(resolution);
 			
+			APILocator.getUserAPI().save(u, u, true);
 			
 			TimeZone.setDefault(TimeZone.getTimeZone(timeZoneId));
-			CacheLocator.getCacheAdministrator().flushGroup(CacheLocator.getUserCache().getPrimaryGroup());
+//			CacheLocator.getCacheAdministrator().flushGroup(CacheLocator.getUserCache().getPrimaryGroup());
 			
-		}catch (com.liferay.portal.PortalException pe) {
-			throw pe;
-		}
-		catch (com.liferay.portal.SystemException se) {
-			throw se;
-		}
-		catch (Exception e) {
+//		}catch (com.liferay.portal.PortalException pe) {
+//			throw pe;
+//		}
+//		catch (com.liferay.portal.SystemException se) {
+//			throw se;
+//		}
+		}catch (Exception e) {
 			throw new com.liferay.portal.SystemException(e);
 		}
 	}

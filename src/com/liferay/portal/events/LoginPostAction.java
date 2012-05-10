@@ -32,7 +32,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.struts.Globals;
 
 import com.liferay.portal.model.User;
-import com.liferay.portal.model.UserTracker;
 import com.liferay.portal.struts.Action;
 import com.liferay.portal.struts.ActionException;
 import com.liferay.portal.util.PortalUtil;
@@ -57,48 +56,48 @@ public class LoginPostAction extends Action {
 		try {
 			HttpSession ses = req.getSession();
 
-			String companyId = PortalUtil.getCompanyId(req);
+//			String companyId = PortalUtil.getCompanyId(req);
 			User user = PortalUtil.getUser(req);
 
-			Map currentUsers =
-				(Map)WebAppPool.get(companyId, WebKeys.CURRENT_USERS);
+//			Map currentUsers =
+//				(Map)WebAppPool.get(companyId, WebKeys.CURRENT_USERS);
+//
+//			boolean simultaenousLogins = GetterUtil.get(
+//				PropsUtil.get(PropsUtil.AUTH_SIMULTANEOUS_LOGINS), true);
 
-			boolean simultaenousLogins = GetterUtil.get(
-				PropsUtil.get(PropsUtil.AUTH_SIMULTANEOUS_LOGINS), true);
+//			if (!simultaenousLogins) {
+//				Map.Entry[] currentUsersArray =
+//					(Map.Entry[])currentUsers.entrySet().toArray(
+//						new Map.Entry[0]);
+//
+////				for (int i = 0; i < currentUsersArray.length; i++) {
+////					Map.Entry mapEntry = currentUsersArray[i];
+////
+//////					UserTracker userTracker = (UserTracker)mapEntry.getValue();
+//////
+//////					if (userTracker.getUserId().equals(user.getUserId())) {
+//////
+//////						// Disable old login
+//////
+//////						userTracker.getHttpSession().setAttribute(
+//////							WebKeys.STALE_SESSION, new Boolean(true));
+//////					}
+////				}
+//			}
 
-			if (!simultaenousLogins) {
-				Map.Entry[] currentUsersArray =
-					(Map.Entry[])currentUsers.entrySet().toArray(
-						new Map.Entry[0]);
-
-				for (int i = 0; i < currentUsersArray.length; i++) {
-					Map.Entry mapEntry = currentUsersArray[i];
-
-					UserTracker userTracker = (UserTracker)mapEntry.getValue();
-
-					if (userTracker.getUserId().equals(user.getUserId())) {
-
-						// Disable old login
-
-						userTracker.getHttpSession().setAttribute(
-							WebKeys.STALE_SESSION, new Boolean(true));
-					}
-				}
-			}
-
-			UserTracker userTracker =
-				(UserTracker)currentUsers.get(ses.getId());
-
-			if (userTracker == null) {
-				userTracker = new UserTracker(
-					ses.getId(), companyId, PortalUtil.getUser(req).getUserId(), new Date(),
-					req.getRemoteAddr(), req.getRemoteHost(),
-					req.getHeader("USER-AGENT"));
-
-				userTracker.setHttpSession(ses);
-
-				currentUsers.put(ses.getId(), userTracker);
-			}
+//			UserTracker userTracker =
+//				(UserTracker)currentUsers.get(ses.getId());
+//
+//			if (userTracker == null) {
+//				userTracker = new UserTracker(
+//					ses.getId(), companyId, PortalUtil.getUser(req).getUserId(), new Date(),
+//					req.getRemoteAddr(), req.getRemoteHost(),
+//					req.getHeader("USER-AGENT"));
+//
+//				userTracker.setHttpSession(ses);
+//
+//				currentUsers.put(ses.getId(), userTracker);
+//			}
 
 //			if (!GetterUtil.getBoolean(PropsUtil.get(
 //					PropsUtil.LAYOUT_REMEMBER_WINDOW_STATE_MAXIMIZED))) {
@@ -130,27 +129,6 @@ public class LoginPostAction extends Action {
 //					}
 //				}
 //			}
-
-			if (BrowserSniffer.is_ns_4(req)) {
-
-				// Netscape 4.x users should never see dotted or rounded skins
-
-				boolean dottedSkins = false;
-				boolean roundedSkins = false;
-
-				PortalUtil.updateUser(
-					req, res, user.getUserId(), user.getFirstName(),
-					user.getMiddleName(), user.getLastName(),
-					user.getNickName(), user.isMale(), user.getBirthday(),
-					user.getEmailAddress(), user.getSmsId(), user.getAimId(),
-					user.getIcqId(), user.getMsnId(), user.getYmId(),
-					user.getFavoriteActivity(), user.getFavoriteBibleVerse(),
-					user.getFavoriteFood(), user.getFavoriteMovie(),
-					user.getFavoriteMusic(), user.getLanguageId(),
-					user.getTimeZoneId(), user.getSkinId(), dottedSkins,
-					roundedSkins, user.getGreeting(), user.getResolution(),
-					user.getRefreshRate(), user.getComments());
-			}
 
 			// Reset the locale
 

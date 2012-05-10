@@ -154,8 +154,4 @@ public class AdminConfigPool implements Cachable {
 	
 	private static AdminConfigPool _instance;
 	private boolean _cacheable;
-
-	public void clearCache() {
-		clear();
-	}
 }

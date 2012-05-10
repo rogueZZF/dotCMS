@@ -134,12 +134,6 @@ public class Html {
 		//return text;
 	}
 
-	/**
-	 * This method will not allow something like "text <no closing tag" You would get "test " back
-	 * 
-	 * @param text
-	 * @return
-	 */
 	public static String stripHtml(String text) {
 		if (text == null) {
 			return null;
@@ -156,7 +150,7 @@ public class Html {
 
 			x = text.indexOf(">", y) + 1;
 
-			if (x==0 || x < y) {
+			if (x < y) {
 
 				// <b>Hello</b
 

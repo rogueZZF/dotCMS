@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import com.dotmarketing.business.APILocator;
+import com.dotmarketing.exception.DotDataException;
 import com.dotmarketing.util.Logger;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.util.Base64;
@@ -101,24 +102,22 @@ public class Company extends CompanyModel {
 		super.setKey(Base64.objectToString(keyObj));
 	}
 
-	public User getDefaultUser() {
-		User defaultUser = null;
-
-		try {
-			defaultUser = APILocator.getUserAPI().getDefaultUser();
-		} catch (Exception e) {
-			Logger.error(this, e.getMessage(), e);
-		}
-
-		return defaultUser;
-	}
-
 	public Locale getLocale() {
-		return getDefaultUser().getLocale();
+		try {
+			return APILocator.getUserAPI().getSystemUser().getLocale();
+		} catch (DotDataException e) {
+			Logger.error(Company.class,e.getMessage(),e);
+		}
+		return null;
 	}
 
 	public TimeZone getTimeZone() {
-		return getDefaultUser().getTimeZone();
+		try{
+			return APILocator.getUserAPI().getSystemUser().getTimeZone();
+		} catch (DotDataException e) {
+			Logger.error(Company.class,e.getMessage(),e);
+		}
+		return null;
 	}
 
 	public String getAdminName() {

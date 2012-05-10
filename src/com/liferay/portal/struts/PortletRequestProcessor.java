@@ -159,12 +159,7 @@ public class PortletRequestProcessor extends StxxTilesRequestProcessor {
 
 					forward = forwardURL.toString();
 				}
-				if( forward.contains("?")){
-					forward = forward + "&r=" + System.currentTimeMillis();
-				}
-				else{
-					forward = forward + "?r=" + System.currentTimeMillis();
-				}
+
 				res.sendRedirect(forward);
 			}
 		}

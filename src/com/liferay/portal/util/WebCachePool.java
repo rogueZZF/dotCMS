@@ -67,9 +67,5 @@ public class WebCachePool implements Cachable{
     public String[] getGroups() {
     	return groupNames;
     }
-
-	public void clearCache() {
-		cache.flushGroup(primaryGroup);
-	}
 	
 }

@@ -156,8 +156,4 @@ public class PollsVotePool implements Cachable{
 	
 	private static PollsVotePool _instance;
 	private boolean _cacheable;
-
-	public void clearCache() {
-		clear();
-	}
 }

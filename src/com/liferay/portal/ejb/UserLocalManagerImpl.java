@@ -269,7 +269,7 @@ public class UserLocalManagerImpl implements UserLocalManager {
 		return user;
 	}
 
-
+	
 	public void deleteUser(String userId)
 		throws PortalException, SystemException {
 
@@ -310,7 +310,7 @@ public class UserLocalManagerImpl implements UserLocalManager {
 
 		// Delete user's mail
 
-		//MailManagerUtil.deleteUser(userId);
+		MailManagerUtil.deleteUser(userId);
 
 		// Delete user
 
@@ -352,7 +352,7 @@ public class UserLocalManagerImpl implements UserLocalManager {
 		return UserUtil.findByC_U(companyId, userId);
 	}
 
-
+	
 	public User updateActive(String userId, boolean active)
 		throws PortalException, SystemException {
 
@@ -415,7 +415,7 @@ public class UserLocalManagerImpl implements UserLocalManager {
 		UserUtil.update(user);
 		return user;
 	}
-
+	
 	public User updateUser(
 			String userId, String password, String firstName, String middleName,
 			String lastName, String nickName, boolean male, Date birthday,
@@ -525,13 +525,13 @@ public class UserLocalManagerImpl implements UserLocalManager {
 //				}
 //			}
 
-//			String[] companyIds = PortalInstances.getCompanyIds();
-//
-//			for (int i = 0; i < companyIds.length; i++) {
-//				if (userId.indexOf(companyIds[i]) != -1) {
-//					throw new UserIdException();
-//				}
-//			}
+			String[] companyIds = PortalInstances.getCompanyIds();
+
+			for (int i = 0; i < companyIds.length; i++) {
+				if (userId.indexOf(companyIds[i]) != -1) {
+					throw new UserIdException();
+				}
+			}
 
 			try {
 				User user = UserUtil.findByPrimaryKey(userId);

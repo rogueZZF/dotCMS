@@ -32,9 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.dotmarketing.util.Logger;
-import com.liferay.portal.ejb.UserTrackerLocalManagerUtil;
 import com.liferay.portal.events.EventsProcessor;
-import com.liferay.portal.model.UserTracker;
 import com.liferay.portal.struts.ActionException;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.WebAppPool;
@@ -96,25 +94,25 @@ public class PortalSessionListener implements HttpSessionListener {
 
 		// User tracker
 
-		if( companyId != null ) {
-			Map currentUsers =
-				(Map)WebAppPool.get(companyId, WebKeys.CURRENT_USERS);
+//		if( companyId != null ) {
+//			Map currentUsers =
+//				(Map)WebAppPool.get(companyId, WebKeys.CURRENT_USERS);
 	
-			UserTracker userTracker = (UserTracker)currentUsers.remove(ses.getId());
+//			UserTracker userTracker = (UserTracker)currentUsers.remove(ses.getId());
 	
-			try {
-				if (userTracker != null) {
-					UserTrackerLocalManagerUtil.addUserTracker(
-						userTracker.getCompanyId(), userTracker.getUserId(),
-						userTracker.getModifiedDate(), userTracker.getRemoteAddr(),
-						userTracker.getRemoteHost(), userTracker.getUserAgent(),
-						userTracker.getPaths());
-				}
-			}
-			catch (Exception e) {
-				Logger.error(this,e.getMessage(),e);
-			}
-		}
+//			try {
+//				if (userTracker != null) {
+//					UserTrackerLocalManagerUtil.addUserTracker(
+//						userTracker.getCompanyId(), userTracker.getUserId(),
+//						userTracker.getModifiedDate(), userTracker.getRemoteAddr(),
+//						userTracker.getRemoteHost(), userTracker.getUserAgent(),
+//						userTracker.getPaths());
+//				}
+//			}
+//			catch (Exception e) {
+//				Logger.error(this,e.getMessage(),e);
+//			}
+//		}
 
 		// Process session destroyed events
 

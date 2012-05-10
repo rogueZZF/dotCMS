@@ -45,15 +45,14 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PreferencesValidator;
 import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.ValidatorException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.struts.Globals;
 
+import com.dotmarketing.business.APILocator;
 import com.dotmarketing.business.Role;
 import com.dotmarketing.business.web.WebAPILocator;
 import com.dotmarketing.cms.factories.PublicCompanyFactory;
@@ -62,8 +61,6 @@ import com.liferay.portal.PortalException;
 import com.liferay.portal.SystemException;
 import com.liferay.portal.ejb.CompanyLocalManagerUtil;
 import com.liferay.portal.ejb.PortletPreferencesPK;
-import com.liferay.portal.ejb.UserLocalManagerUtil;
-import com.liferay.portal.ejb.UserManagerUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.User;
@@ -77,7 +74,6 @@ import com.liferay.portlet.PortletContextImpl;
 import com.liferay.portlet.PortletPreferencesImpl;
 import com.liferay.portlet.PortletPreferencesWrapper;
 import com.liferay.portlet.RenderRequestImpl;
-import com.liferay.portlet.RenderResponseImpl;
 import com.liferay.util.CollectionFactory;
 import com.liferay.util.GetterUtil;
 import com.liferay.util.Http;
@@ -699,8 +695,7 @@ public class PortalUtil {
 		User user = null;
 
 		try {
-			user = UserLocalManagerUtil.getUserByEmailAddress(
-				getCompanyId(req), emailAddress);
+			user = APILocator.getUserAPI().loadByUserByEmail(emailAddress, APILocator.getUserAPI().getSystemUser(), true);
 		}
 		catch (Exception e) {
 		}
@@ -753,7 +748,12 @@ public class PortalUtil {
 		User user = (User)req.getAttribute(WebKeys.USER);
 
 		if (user == null) {
-			user = UserLocalManagerUtil.getUserById(userId);
+			try {
+				user = APILocator.getUserAPI().loadUserById(userId,APILocator.getUserAPI().getSystemUser(),true);
+			} catch (Exception e) {
+				Logger.error(PortalUtil.class,e.getMessage(),e);
+				throw new PortalException(e);
+			}
 
 			req.setAttribute(WebKeys.USER, user);
 		}
@@ -806,9 +806,10 @@ public class PortalUtil {
 		String userName = defaultUserName;
 
 		try {
-			userName = UserLocalManagerUtil.getUserById(userId).getFullName();
+			userName = APILocator.getUserAPI().loadUserById(userId,APILocator.getUserAPI().getSystemUser(),true).getFullName();
 		}
 		catch (Exception e) {
+			Logger.error(PortalUtil.class, "Unable to load user" + e.getMessage(),e);
 		}
 
 		return userName;
@@ -966,115 +967,115 @@ public class PortalUtil {
 //		}
 //	}
 
-	public static User updateUser(
-			HttpServletRequest req, HttpServletResponse res, String userId,
-			String password1, String password2, boolean passwordReset)
-		throws PortalException, SystemException {
+//	public static User updateUser(
+//			HttpServletRequest req, HttpServletResponse res, String userId,
+//			String password1, String password2, boolean passwordReset)
+//		throws PortalException, SystemException {
+//
+//		User user = UserManagerUtil.updateUser(
+//			userId, password1, password2, passwordReset);
+//
+//		return user;
+//	}
 
-		User user = UserManagerUtil.updateUser(
-			userId, password1, password2, passwordReset);
+//	public static User updateUser(
+//			ActionRequest req, ActionResponse res, String userId,
+//			String password1, String password2, boolean passwordReset)
+//		throws PortalException, SystemException {
+//
+//		ActionRequestImpl reqImpl = (ActionRequestImpl)req;
+//		ActionResponseImpl resImpl = (ActionResponseImpl)res;
+//
+//		return updateUser(
+//			reqImpl.getHttpServletRequest(), resImpl.getHttpServletResponse(),
+//			userId, password1,  password2, passwordReset);
+//	}
 
-		return user;
-	}
-
-	public static User updateUser(
-			ActionRequest req, ActionResponse res, String userId,
-			String password1, String password2, boolean passwordReset)
-		throws PortalException, SystemException {
-
-		ActionRequestImpl reqImpl = (ActionRequestImpl)req;
-		ActionResponseImpl resImpl = (ActionResponseImpl)res;
-
-		return updateUser(
-			reqImpl.getHttpServletRequest(), resImpl.getHttpServletResponse(),
-			userId, password1,  password2, passwordReset);
-	}
-
-	public static User updateUser(
-			RenderRequest req, RenderResponse res, String userId,
-			String password1, String password2, boolean passwordReset)
-		throws PortalException, SystemException {
-
-		RenderRequestImpl reqImpl = (RenderRequestImpl)req;
-		RenderResponseImpl resImpl = (RenderResponseImpl)res;
-
-		return updateUser(
-			reqImpl.getHttpServletRequest(), resImpl.getHttpServletResponse(),
-			userId, password1,  password2, passwordReset);
-	}
-
-	public static User updateUser(
-			HttpServletRequest req, HttpServletResponse res, String userId,
-			String firstName, String middleName, String lastName,
-			String nickName, boolean male, Date birthday, String emailAddress,
-			String smsId, String aimId, String icqId, String msnId, String ymId,
-			String favoriteActivity, String favoriteBibleVerse,
-			String favoriteFood, String favoriteMovie, String favoriteMusic,
-			String languageId, String timeZoneId, String skinId,
-			boolean dottedSkins, boolean roundedSkins, String greeting,
-			String resolution, String refreshRate, String comments)
-		throws PortalException, SystemException {
-
-		String password = getUserPassword(req);
-		if (!userId.equals(getUserId(req))) {
-			password = StringPool.BLANK;
-		}
-
-		return UserManagerUtil.updateUser(
-			userId, password, firstName, middleName, lastName, nickName, male,
-			birthday, emailAddress, smsId, aimId, icqId, msnId, ymId,
-			favoriteActivity, favoriteBibleVerse, favoriteFood, favoriteMovie,
-			favoriteMusic, languageId, timeZoneId, skinId, dottedSkins,
-			roundedSkins, greeting, resolution, refreshRate, comments);
-	}
-
-	public static User updateUser(
-			ActionRequest req, ActionResponse res, String userId,
-			String firstName, String middleName, String lastName,
-			String nickName, boolean male, Date birthday, String emailAddress,
-			String smsId, String aimId, String icqId, String msnId, String ymId,
-			String favoriteActivity, String favoriteBibleVerse,
-			String favoriteFood, String favoriteMovie, String favoriteMusic,
-			String languageId, String timeZoneId, String skinId,
-			boolean dottedSkins, boolean roundedSkins, String greeting,
-			String resolution, String refreshRate, String comments)
-		throws PortalException, SystemException {
-
-		ActionRequestImpl reqImpl = (ActionRequestImpl)req;
-		ActionResponseImpl resImpl = (ActionResponseImpl)res;
-
-		return updateUser(
-			reqImpl.getHttpServletRequest(), resImpl.getHttpServletResponse(),
-			userId, firstName, middleName, lastName, nickName, male, birthday,
-			emailAddress, smsId, aimId, icqId, msnId, ymId, favoriteActivity,
-			favoriteBibleVerse, favoriteFood, favoriteMovie, favoriteMusic,
-			languageId, timeZoneId, skinId, dottedSkins, roundedSkins, greeting,
-			resolution, refreshRate, comments);
-	}
-
-	public static User updateUser(
-			RenderRequest req, RenderResponse res, String userId,
-			String firstName, String middleName, String lastName,
-			String nickName, boolean male, Date birthday, String emailAddress,
-			String smsId, String aimId, String icqId, String msnId, String ymId,
-			String favoriteActivity, String favoriteBibleVerse,
-			String favoriteFood, String favoriteMovie, String favoriteMusic,
-			String languageId, String timeZoneId, String skinId,
-			boolean dottedSkins, boolean roundedSkins, String greeting,
-			String resolution, String refreshRate, String comments)
-		throws PortalException, SystemException {
-
-		RenderRequestImpl reqImpl = (RenderRequestImpl)req;
-		RenderResponseImpl resImpl = (RenderResponseImpl)res;
-
-		return updateUser(
-			reqImpl.getHttpServletRequest(), resImpl.getHttpServletResponse(),
-			userId, firstName, middleName, lastName, nickName, male, birthday,
-			emailAddress, smsId, aimId, icqId, msnId, ymId, favoriteActivity,
-			favoriteBibleVerse, favoriteFood, favoriteMovie, favoriteMusic,
-			languageId, timeZoneId, skinId, dottedSkins, roundedSkins, greeting,
-			resolution, refreshRate, comments);
-	}
+//	public static User updateUser(
+//			RenderRequest req, RenderResponse res, String userId,
+//			String password1, String password2, boolean passwordReset)
+//		throws PortalException, SystemException {
+//
+//		RenderRequestImpl reqImpl = (RenderRequestImpl)req;
+//		RenderResponseImpl resImpl = (RenderResponseImpl)res;
+//
+//		return updateUser(
+//			reqImpl.getHttpServletRequest(), resImpl.getHttpServletResponse(),
+//			userId, password1,  password2, passwordReset);
+//	}
+//
+//	public static User updateUser(
+//			HttpServletRequest req, HttpServletResponse res, String userId,
+//			String firstName, String middleName, String lastName,
+//			String nickName, boolean male, Date birthday, String emailAddress,
+//			String smsId, String aimId, String icqId, String msnId, String ymId,
+//			String favoriteActivity, String favoriteBibleVerse,
+//			String favoriteFood, String favoriteMovie, String favoriteMusic,
+//			String languageId, String timeZoneId, String skinId,
+//			boolean dottedSkins, boolean roundedSkins, String greeting,
+//			String resolution, String refreshRate, String comments)
+//		throws PortalException, SystemException {
+//
+//		String password = getUserPassword(req);
+//		if (!userId.equals(getUserId(req))) {
+//			password = StringPool.BLANK;
+//		}
+//
+//		return UserManagerUtil.updateUser(
+//			userId, password, firstName, middleName, lastName, nickName, male,
+//			birthday, emailAddress, smsId, aimId, icqId, msnId, ymId,
+//			favoriteActivity, favoriteBibleVerse, favoriteFood, favoriteMovie,
+//			favoriteMusic, languageId, timeZoneId, skinId, dottedSkins,
+//			roundedSkins, greeting, resolution, refreshRate, comments);
+//	}
+//
+//	public static User updateUser(
+//			ActionRequest req, ActionResponse res, String userId,
+//			String firstName, String middleName, String lastName,
+//			String nickName, boolean male, Date birthday, String emailAddress,
+//			String smsId, String aimId, String icqId, String msnId, String ymId,
+//			String favoriteActivity, String favoriteBibleVerse,
+//			String favoriteFood, String favoriteMovie, String favoriteMusic,
+//			String languageId, String timeZoneId, String skinId,
+//			boolean dottedSkins, boolean roundedSkins, String greeting,
+//			String resolution, String refreshRate, String comments)
+//		throws PortalException, SystemException {
+//
+//		ActionRequestImpl reqImpl = (ActionRequestImpl)req;
+//		ActionResponseImpl resImpl = (ActionResponseImpl)res;
+//
+//		return updateUser(
+//			reqImpl.getHttpServletRequest(), resImpl.getHttpServletResponse(),
+//			userId, firstName, middleName, lastName, nickName, male, birthday,
+//			emailAddress, smsId, aimId, icqId, msnId, ymId, favoriteActivity,
+//			favoriteBibleVerse, favoriteFood, favoriteMovie, favoriteMusic,
+//			languageId, timeZoneId, skinId, dottedSkins, roundedSkins, greeting,
+//			resolution, refreshRate, comments);
+//	}
+//
+//	public static User updateUser(
+//			RenderRequest req, RenderResponse res, String userId,
+//			String firstName, String middleName, String lastName,
+//			String nickName, boolean male, Date birthday, String emailAddress,
+//			String smsId, String aimId, String icqId, String msnId, String ymId,
+//			String favoriteActivity, String favoriteBibleVerse,
+//			String favoriteFood, String favoriteMovie, String favoriteMusic,
+//			String languageId, String timeZoneId, String skinId,
+//			boolean dottedSkins, boolean roundedSkins, String greeting,
+//			String resolution, String refreshRate, String comments)
+//		throws PortalException, SystemException {
+//
+//		RenderRequestImpl reqImpl = (RenderRequestImpl)req;
+//		RenderResponseImpl resImpl = (RenderResponseImpl)res;
+//
+//		return updateUser(
+//			reqImpl.getHttpServletRequest(), resImpl.getHttpServletResponse(),
+//			userId, firstName, middleName, lastName, nickName, male, birthday,
+//			emailAddress, smsId, aimId, icqId, msnId, ymId, favoriteActivity,
+//			favoriteBibleVerse, favoriteFood, favoriteMovie, favoriteMusic,
+//			languageId, timeZoneId, skinId, dottedSkins, roundedSkins, greeting,
+//			resolution, refreshRate, comments);
+//	}
 
 	private static PortalUtil _getInstance() {
 		if (_instance == null) {

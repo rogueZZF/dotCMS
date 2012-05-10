@@ -8,13 +8,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.dotmarketing.beans.Host;
 import com.dotmarketing.business.APILocator;
-import com.dotmarketing.business.web.HostWebAPI;
-import com.dotmarketing.business.web.UserWebAPI;
-import com.dotmarketing.business.web.WebAPILocator;
 import com.dotmarketing.util.Logger;
-import com.dotmarketing.util.UtilMethods;
 import com.liferay.portal.auth.PrincipalThreadLocal;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.Constants;
@@ -45,24 +40,6 @@ public class LogoutAsAction extends Action {
 
 		}
 		
-		HostWebAPI hostWebAPI  = WebAPILocator.getHostWebAPI();
-		UserWebAPI userWebAPI = WebAPILocator.getUserWebAPI();
-		User systemUser = userWebAPI.getSystemUser();
-		boolean respectFrontendRoles = !userWebAPI.isLoggedToBackend(req);
-		String serverName = req.getServerName();
-		Host host = null;
-		if (UtilMethods.isSet(serverName)) {
-		host = hostWebAPI.findByName(serverName, systemUser, respectFrontendRoles);
-		if(host == null)
-			host = hostWebAPI.findByAlias(serverName, systemUser, respectFrontendRoles);
-		//If no host matches then we return the default host
-		if(host == null)
-			host = hostWebAPI.findDefaultHost(systemUser, respectFrontendRoles);
-		} else {
-			host = hostWebAPI.findDefaultHost(systemUser, respectFrontendRoles);
-		}
-		
-		req.getSession().setAttribute(com.dotmarketing.util.WebKeys.CURRENT_HOST, host);
 		return mapping.findForward(Constants.COMMON_REFERER);
 
 	}

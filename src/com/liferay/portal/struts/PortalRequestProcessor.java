@@ -70,8 +70,6 @@ import com.liferay.portal.ejb.PortletManagerUtil;
 import com.liferay.portal.ejb.PortletPreferencesManagerUtil;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.User;
-import com.liferay.portal.model.UserTracker;
-import com.liferay.portal.model.UserTrackerPath;
 import com.liferay.portal.util.Constants;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
@@ -138,17 +136,8 @@ public class PortalRequestProcessor extends StxxTilesRequestProcessor {
 
 
 			if(PortalUtil.getUserId(req) == null){
-				res.sendRedirect("/html/portal/login.jsp?r=" + System.currentTimeMillis());
+				res.sendRedirect("/html/portal/login.jsp");
 			}else{
-				
-				if(lastPath != null){
-					if( lastPath.contains("?")){
-						lastPath = lastPath + "&r=" + System.currentTimeMillis();
-					}
-					else{
-						lastPath = lastPath + "?r=" + System.currentTimeMillis();
-					}
-				}
 				res.sendRedirect(lastPath);
 			}
 			return;
@@ -204,16 +193,16 @@ public class PortalRequestProcessor extends StxxTilesRequestProcessor {
 
 		String companyId = PortalUtil.getCompanyId(req);
 
-		Map currentUsers = (Map)WebAppPool.get(
-			companyId, WebKeys.CURRENT_USERS);
+//		Map currentUsers = (Map)WebAppPool.get(
+//			companyId, WebKeys.CURRENT_USERS);
 
-		UserTracker userTracker = (UserTracker)currentUsers.get(ses.getId());
+//		UserTracker userTracker = (UserTracker)currentUsers.get(ses.getId());
 
-		if ((userTracker != null) &&
-			((path != null) &&
-				(!path.equals(_PATH_C)) &&
-				(path.indexOf(_PATH_J_SECURITY_CHECK) == -1) &&
-				(path.indexOf(_PATH_PORTAL_PROTECTED) == -1))) {
+//		if ((userTracker != null) &&
+//			((path != null) &&
+//				(!path.equals(_PATH_C)) &&
+//				(path.indexOf(_PATH_J_SECURITY_CHECK) == -1) &&
+//				(path.indexOf(_PATH_PORTAL_PROTECTED) == -1))) {
 
 			/*Map parameterMap = null;
 
@@ -234,12 +223,12 @@ public class PortalRequestProcessor extends StxxTilesRequestProcessor {
 			fullPathSB.append(StringPool.QUESTION);
 			fullPathSB.append(req.getQueryString());
 
-			userTracker.addPath(
-				new UserTrackerPath(
-					userTracker.getUserTrackerId(),
-					userTracker.getUserTrackerId(), fullPathSB.toString(),
-					new Date()));
-		}
+//			userTracker.addPath(
+//				new UserTrackerPath(
+//					userTracker.getUserTrackerId(),
+//					userTracker.getUserTrackerId(), fullPathSB.toString(),
+//					new Date()));
+//		}
 
 		String userId = req.getRemoteUser();
 
@@ -415,7 +404,7 @@ public class PortalRequestProcessor extends StxxTilesRequestProcessor {
 			if (user == null) {
 				SessionErrors.add(req, PrincipalException.class.getName());
 
-				res.sendRedirect("/c/portal_public/login?r="  +System.currentTimeMillis());
+				res.sendRedirect("/c/portal_public/login");
 				return null;
 			}
 		}
@@ -586,7 +575,7 @@ public class PortalRequestProcessor extends StxxTilesRequestProcessor {
 					req.setAttribute(WebKeys.LAYOUT, layout);
 				}
 				if(layout == null){
-					res.sendRedirect("/c/portal/logout?referer=/&r="  +System.currentTimeMillis());
+					res.sendRedirect("/c/portal/logout?referer=/" );
 					return null;
 				}
 	
@@ -597,7 +586,7 @@ public class PortalRequestProcessor extends StxxTilesRequestProcessor {
 				req.getSession().setAttribute(com.dotmarketing.util.WebKeys.ADMIN_MODE_SESSION, "true");	
 	
 				if(host != null || sendMeTo.getHostId().equals(host.getInode())){
-					res.sendRedirect(sendMeTo.getURI() + "?host_id=" +host.getIdentifier() +"&r="  +System.currentTimeMillis());
+					res.sendRedirect(sendMeTo.getURI() + "?host_id=" +host.getIdentifier() );
 					return null;
 				}
 

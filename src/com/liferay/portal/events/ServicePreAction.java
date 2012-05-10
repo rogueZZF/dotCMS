@@ -75,7 +75,7 @@ public class ServicePreAction extends Action {
 			boolean signedIn = false;
 
 			if (user == null) {
-				user = PortalUtil.getCompany(req).getDefaultUser();
+				user = APILocator.getUserAPI().getSystemUser();
 			}
 			else {
 				signedIn = true;

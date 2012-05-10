@@ -156,8 +156,4 @@ public class ImagePool implements Cachable{
     
 	private static ImagePool _instance;
 	private boolean _cacheable;
-
-	public void clearCache() {
-		clear();
-	}
 }

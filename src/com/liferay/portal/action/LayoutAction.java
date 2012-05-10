@@ -42,7 +42,6 @@ import org.apache.struts.action.ActionMapping;
 
 import com.dotmarketing.business.APILocator;
 import com.dotmarketing.business.Layout;
-import com.dotmarketing.util.InodeUtils;
 import com.liferay.portal.ejb.PortletManagerUtil;
 import com.liferay.portal.ejb.PortletPreferencesManagerUtil;
 import com.liferay.portal.model.Portlet;
@@ -152,7 +151,7 @@ public class LayoutAction extends Action {
 		
 		String layoutId = null;
 
-		if (layout == null || !InodeUtils.isSet(layoutId)) {
+		if (layout == null) {
 			User user = PortalUtil.getUser(req);
 			List<Layout> userLayouts = APILocator.getLayoutAPI().loadLayoutsForUser(user);
 			if(userLayouts != null && userLayouts.size() > 0){

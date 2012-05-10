@@ -25,7 +25,6 @@ package com.liferay.portal.action;
 import java.util.List;
 import java.util.Locale;
 
-import javax.portlet.WindowState;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,23 +43,17 @@ import com.dotmarketing.business.Layout;
 import com.dotmarketing.business.UserAPI;
 import com.dotmarketing.business.web.WebAPILocator;
 import com.dotmarketing.exception.DotSecurityException;
-import com.dotmarketing.factories.PreviewFactory;
 import com.dotmarketing.util.Logger;
-import com.dotmarketing.util.SecurityLogger;
 import com.dotmarketing.util.UtilMethods;
 import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.RequiredLayoutException;
 import com.liferay.portal.SendPasswordException;
-import com.liferay.portal.UserActiveException;
 import com.liferay.portal.UserEmailAddressException;
 import com.liferay.portal.UserIdException;
 import com.liferay.portal.UserPasswordException;
 import com.liferay.portal.auth.AuthException;
 import com.liferay.portal.auth.Authenticator;
 import com.liferay.portal.auth.PrincipalFinder;
-import com.liferay.portal.ejb.UserLocalManagerUtil;
-import com.liferay.portal.ejb.UserManagerUtil;
-import com.liferay.portal.events.EventsProcessor;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.Constants;
@@ -68,10 +61,8 @@ import com.liferay.portal.util.CookieKeys;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.util.Encryptor;
 import com.liferay.util.InstancePool;
 import com.liferay.util.ParamUtil;
-import com.liferay.util.ServerDetector;
 import com.liferay.util.Validator;
 import com.liferay.util.servlet.SessionErrors;
 import com.liferay.util.servlet.SessionMessages;
@@ -79,7 +70,7 @@ import com.liferay.util.servlet.SessionMessages;
 /**
  * <a href="LoginAction.java.html"><b><i>View Source</i></b></a>
  *
- * @author  Brian Wing Shun Changer
+ * @author  Brian Wing Shun Chan
  * @version $Revision: 1.4 $
  *
  */
@@ -98,24 +89,21 @@ public class LoginAction extends Action {
 			try {
 				_login(req, res);
 				
-				User user = UserLocalManagerUtil.getUserById((String) ses.getAttribute(WebKeys.USER_ID));
+				User user = APILocator.getUserAPI().loadUserById(((String) ses.getAttribute(WebKeys.USER_ID)), APILocator.getUserAPI().getSystemUser(), true);
 				List<Layout> userLayouts = APILocator.getLayoutAPI().loadLayoutsForUser(user);
 				if ((userLayouts == null) || (userLayouts.size() == 0) || !UtilMethods.isSet(userLayouts.get(0).getId())) {
 					new LogoutAction().execute(mapping, form, req, res);
 					throw new RequiredLayoutException();
 				}
 				
-				Layout layout = userLayouts.get(0);
-				List<String> portletIds = layout.getPortletIds();
-				String portletId = portletIds.get(0);
-				java.util.Map<String, String[]> params = new java.util.HashMap<String, String[]>();
-				params.put("struts_action",new String[] {"/ext/director/direct"});
-				String directorURL = com.dotmarketing.util.PortletURLUtil.getActionURL(req,layout.getId(),WindowState.MAXIMIZED.toString(),params, portletId);
-				ses.setAttribute(com.dotmarketing.util.WebKeys.DIRECTOR_URL, directorURL);
-				
 
 				// Touch protected resource
+
 				return mapping.findForward("/portal/touch_protected.jsp");
+				
+				
+				
+				
 				
 			}
 			catch (Exception e) {
@@ -125,8 +113,7 @@ public class LoginAction extends Action {
 					e instanceof UserEmailAddressException ||
 					e instanceof UserIdException ||
 					e instanceof UserPasswordException ||
-					e instanceof RequiredLayoutException ||
-					e instanceof UserActiveException) {
+					e instanceof RequiredLayoutException) {
 
 					SessionErrors.add(req, e.getClass().getName());
 
@@ -191,14 +178,12 @@ public class LoginAction extends Action {
 		Company company = PortalUtil.getCompany(req);
 
 		if (company.getAuthType().equals(Company.AUTH_TYPE_EA)) {
-			authResult = UserManagerUtil.authenticateByEmailAddress(
-				company.getCompanyId(), login, password);
+			authResult = APILocator.getUserAPI().authenticate(login, password);
 
-			userId = UserManagerUtil.getUserId(company.getCompanyId(), login);
+//			userId = APILocator.getUserAPI().loadUserById(login, APILocator.getUserAPI().getSystemUser(), true).getUserId();
 		}
 		else {
-			authResult = UserManagerUtil.authenticateByUserId(
-				company.getCompanyId(), login, password);
+			authResult = APILocator.getUserAPI().authenticate(login, password);
 		}
 
 		try {
@@ -212,7 +197,7 @@ public class LoginAction extends Action {
 		}
 
 		if (authResult == Authenticator.SUCCESS) {
-			User user = UserLocalManagerUtil.getUserById(userId);
+			User user = APILocator.getUserAPI().loadUserById(userId,APILocator.getUserAPI().getSystemUser(),true);
 			
 			//DOTCMS-4943
 			UserAPI userAPI = APILocator.getUserAPI();			
@@ -222,9 +207,6 @@ public class LoginAction extends Action {
 			userAPI.save(user, userAPI.getSystemUser(), respectFrontend);
 
 			ses.setAttribute(WebKeys.USER_ID, userId);
-			
-			//DOTCMS-6392
-			PreviewFactory.setVelocityURLS(req);
 			
 			//set the host to the domain of the URL if possible if not use the default host
 			//http://jira.dotmarketing.net/browse/DOTCMS-4475
@@ -245,7 +227,7 @@ public class LoginAction extends Action {
 			}
 						
 			ses.removeAttribute("_failedLoginName");
-			Cookie idCookie = new Cookie(CookieKeys.ID,UserManagerUtil.encryptUserId(userId));
+			Cookie idCookie = new Cookie(CookieKeys.ID,APILocator.getUserAPI().encryptUserId(userId));
 			idCookie.setPath("/");
 
 			
@@ -260,30 +242,23 @@ public class LoginAction extends Action {
 
 			res.addCookie(idCookie);
 
-			EventsProcessor.process(PropsUtil.getArray(PropsUtil.LOGIN_EVENTS_PRE), req, res);
-			EventsProcessor.process(PropsUtil.getArray(PropsUtil.LOGIN_EVENTS_POST), req, res);
-			
 		}
 
 		if (authResult != Authenticator.SUCCESS) {
-			//Logger.info(this, "An ivalid attempt to login as " + login + " has been made from IP: " + req.getRemoteAddr());
-			SecurityLogger.logInfo(this.getClass(),"User " + login + " has sucessfully login from IP: " + req.getRemoteAddr());
+			Logger.info(this, "An ivalid attempt to login as " + login + " has been made from IP: " + req.getRemoteAddr());
 			throw new AuthException();
 		}
 		
-		//Logger.info(this, "User " + login + " has sucessfully login from IP: " + req.getRemoteAddr());
-		SecurityLogger.logInfo(this.getClass(),"User " + login + " has sucessfully login from IP: " + req.getRemoteAddr());
+		Logger.info(this, "User " + login + " has sucessfully login from IP: " + req.getRemoteAddr());
 	}
 
 	private void _sendPassword(HttpServletRequest req) throws Exception {
 		String emailAddress = ParamUtil.getString(
 			req, "my_account_email_address");
 
-		UserManagerUtil.sendPassword(
-			PortalUtil.getCompanyId(req), emailAddress);
+		APILocator.getUserAPI().sendPassword(APILocator.getUserAPI().loadByUserByEmail(emailAddress, APILocator.getUserAPI().getSystemUser(), true));
 
-		//Logger.info(this, "Email address " + emailAddress + " has request to reset his password from IP: " + req.getRemoteAddr());
-		SecurityLogger.logInfo(this.getClass(),"Email address " + emailAddress + " has request to reset his password from IP: " + req.getRemoteAddr());
+		Logger.info(this, "Email address " + emailAddress + " has request to reset his password from IP: " + req.getRemoteAddr());
 
 		SessionMessages.add(req, "new_password_sent", emailAddress);
 	}

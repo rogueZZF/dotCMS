@@ -25,6 +25,8 @@ package com.liferay.portal.ejb;
 import java.util.Date;
 import java.util.Iterator;
 
+import com.dotmarketing.business.APILocator;
+import com.dotmarketing.util.Logger;
 import com.liferay.counter.ejb.CounterManagerUtil;
 import com.liferay.portal.PortalException;
 import com.liferay.portal.SystemException;
@@ -61,7 +63,13 @@ public class PasswordTrackerLocalManagerImpl
 		if (passwordsRecycle > 0) {
 			String newEncPwd = Encryptor.digest(password);
 
-			User user = UserUtil.findByPrimaryKey(userId);
+			User user;
+			try {
+				user = APILocator.getUserAPI().loadUserById(userId, APILocator.getUserAPI().getSystemUser(), true);
+			} catch (Exception e) {
+				Logger.error(this,e.getMessage(),e);
+				throw new SystemException(e);
+			}
 
 			String oldEncPwd = user.getPassword();
 			if (!user.isPasswordEncrypted()) {

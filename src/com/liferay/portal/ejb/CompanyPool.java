@@ -153,8 +153,4 @@ public class CompanyPool implements Cachable{
 	
     private DotCacheAdministrator _cache = CacheLocator.getCacheAdministrator();
 	private boolean _cacheable;
-
-	public void clearCache() {
-		clear();
-	}
 }

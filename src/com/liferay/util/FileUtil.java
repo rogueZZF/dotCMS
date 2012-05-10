@@ -26,7 +26,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -441,7 +440,6 @@ public class FileUtil {
 		}
 		return finalVal;		
 	}
-	
 	/**
 	  * Recursively walk a directory tree and return a List of all
 	  * Files found; the List is sorted using File.compareTo().
@@ -449,43 +447,23 @@ public class FileUtil {
 	  * @param aStartingDir is a valid directory, which can be read.
 	  */
 	  static public List<File> listFilesRecursively(File aStartingDir) throws FileNotFoundException {
-		    return listFilesRecursively(aStartingDir, null);
+	    validateDirectory(aStartingDir);
+	    List<File> result = getFileListingNoSort(aStartingDir);
+	    Collections.sort(result);
+	    return result;
 	  }
-	
-	
-	
-	/**
-	  * Recursively walk a directory tree and return a List of all
-	  * Files found; the List is sorted using File.compareTo().
-	  *
-	  * @param aStartingDir is a valid directory, which can be read.
-	  */
-	  static public List<File> listFilesRecursively(File aStartingDir, FileFilter filter) throws FileNotFoundException {
-		    validateDirectory(aStartingDir);
-		    List<File> result = getFileListingNoSort(aStartingDir, filter);
-		    Collections.sort(result);
-		    return result;
-	  }
-	  
-	  
+
 	  // PRIVATE //
-	  static private List<File> getFileListingNoSort(File aStartingDir, FileFilter filter) throws FileNotFoundException {
+	  static private List<File> getFileListingNoSort(File aStartingDir) throws FileNotFoundException {
 	    List<File> result = new ArrayList<File>();
-	  
-	    File[] filesAndDirs = null;
-	    if(filter !=null){
-	    	filesAndDirs = aStartingDir.listFiles(filter);
-	    }
-	    else{
-	    	filesAndDirs = aStartingDir.listFiles();
-	    }
+	    File[] filesAndDirs = aStartingDir.listFiles();
 	    List<File> filesDirs = Arrays.asList(filesAndDirs);
 	    for(File file : filesDirs) {
 	      result.add(file); //always add, even if directory
 	      if ( ! file.isFile() ) {
 	        //must be a directory
 	        //recursive call!
-	        List<File> deeperList = getFileListingNoSort(file, filter);
+	        List<File> deeperList = getFileListingNoSort(file);
 	        result.addAll(deeperList);
 	      }
 	    }

@@ -157,8 +157,4 @@ public class PollsDisplayPool implements Cachable{
 	
 	private static PollsDisplayPool _instance;
 	private boolean _cacheable;
-
-	public void clearCache() {
-		clear();
-	}
 }

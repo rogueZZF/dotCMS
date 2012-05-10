@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Properties;
 
 import com.dotmarketing.util.Logger;
@@ -80,13 +79,7 @@ public class ReleaseInfo {
 		}
 
 		if (build == null) {
-
-			//build = props.getProperty("dotcms.release.build", "0");
-
-            //TODO:
-            //We are not using build numbers now, also it assumes this number will be always an int, change the method getBuildNumber() to return an String
-            //implies a lot of changes and for the dependencies it have we will have go even to the database model...., this will be change it on future releases...
-            build = "0";
+			build = props.getProperty("dotcms.release.build", "0");
 		}
 		if (date == null) {
 			date = props.getProperty("dotcms.release.date", "March 6 2009");
@@ -118,10 +111,6 @@ public class ReleaseInfo {
 	public static final String getBuildDateString() {
 		return  instance.date;
 	}
-	
-	public static final String getBuildDateString(Locale locale) {
-		return DateFormat.getDateInstance(DateFormat.LONG,locale).format(getBuildDate());
-	}	
 
 	public static final Date getBuildDate() {
 		DateFormat df = DateFormat.getDateInstance(DateFormat.LONG);
@@ -130,8 +119,8 @@ public class ReleaseInfo {
 
 
 	public static final String getReleaseInfo() {
-		//return getName() + " " + getVersion() + " (" + getCodeName() + " / Build " + getBuildNumber() + " / " + getBuildDateString()+ ")";
-		return getName() + " " + getVersion() + " (" + getCodeName() + " / " + getBuildDateString()+ ")";
+		return getName() + " " + getVersion() + " (" + getCodeName() + " / Build " + getBuildNumber() + " / " +
+		getBuildDateString()+ ")";
 	}
 
 	public static String getServerInfo() {

@@ -25,16 +25,12 @@ package com.liferay.portal.model;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
 import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
-import com.liferay.portal.PortalException;
-import com.liferay.portal.SystemException;
-import com.liferay.portal.ejb.AddressManagerUtil;
 import com.liferay.portal.ejb.CompanyManagerUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.Recipient;
@@ -220,11 +216,6 @@ public class User extends UserModel implements Recipient {
 
 		super.setLanguageId(_locale.getLanguage() + "_" + _locale.getCountry());
 	}
-	public void setLocale(Locale locale) {
-		_locale = locale;
-
-		super.setLanguageId(_locale.getLanguage() + "_" + _locale.getCountry());
-	}
 
 	public TimeZone getTimeZone() {
 		return _timeZone;
@@ -265,17 +256,6 @@ public class User extends UserModel implements Recipient {
 		}
 
 		super.setRefreshRate(refreshRate);
-	}
-
-
-	public Address getPrimaryAddress() throws PortalException, SystemException {
-		return AddressManagerUtil.getPrimaryAddress(
-			User.class.getName(), getUserId());
-	}
-
-	public List getAddresses() throws PortalException, SystemException {
-		return AddressManagerUtil.getAddresses(
-			User.class.getName(), getUserId());
 	}
 
 	public BaseModel getProtected() {

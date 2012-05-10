@@ -26,11 +26,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import com.dotmarketing.util.UtilMethods;
+import com.dotmarketing.business.APILocator;
+import com.dotmarketing.business.NoSuchUserException;
+import com.dotmarketing.exception.DotDataException;
+import com.dotmarketing.exception.DotSecurityException;
+import com.dotmarketing.util.Logger;
 import com.liferay.counter.ejb.CounterManagerUtil;
 import com.liferay.portal.PortalException;
 import com.liferay.portal.SystemException;
-import com.liferay.portal.ejb.UserLocalManagerUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.polls.DuplicateVoteException;
@@ -65,7 +68,13 @@ public class PollsQuestionLocalManagerImpl
 
 		_validate(title, description, choices);
 
-		User user = UserLocalManagerUtil.getUserById(userId);
+		User user;
+		try {
+			user = APILocator.getUserAPI().loadUserById(userId,APILocator.getUserAPI().getSystemUser(),true);
+		} catch (Exception e) {
+			Logger.error(PollsQuestionLocalManagerImpl.class,e.getMessage(),e);
+			throw new PortalException(e);
+		}
 
 		String questionId = Long.toString(CounterManagerUtil.increment(
 			PollsQuestion.class.getName()));
@@ -124,7 +133,7 @@ public class PollsQuestionLocalManagerImpl
 	public void deleteQuestion(String questionId)
 		throws PortalException, SystemException {
 
-		PollsQuestion question = PollsQuestionUtil.findByPrimaryKey(questionId);
+//		PollsQuestion question = PollsQuestionUtil.findByPrimaryKey(questionId);
 
 		// Delete all displays associated with this question
 
@@ -150,8 +159,6 @@ public class PollsQuestionLocalManagerImpl
 		throws PortalException, SystemException {
 
 		_validate(title, description, choices);
-
-		User user = UserLocalManagerUtil.getUserById(userId);
 
 		PollsQuestion question = PollsQuestionUtil.findByPrimaryKey(questionId);
 

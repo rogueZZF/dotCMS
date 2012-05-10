@@ -158,8 +158,4 @@ public class PortletPool implements Cachable{
 	
 	private static PortletPool _instance;
 	private boolean _cacheable;
-
-	public void clearCache() {
-		clear();
-	}
 }

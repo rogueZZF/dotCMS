@@ -50,124 +50,79 @@ import com.liferay.util.StringPool;
  *
  */
 public class CompanyLocalManagerImpl implements CompanyLocalManager {
-
-	// Business methods
-
-	public User createDefaultUser(Company company) throws PortalException, SystemException{
-		// Default user
-
-		User defaultUser = null;
-
-		try {
-			defaultUser = UserLocalManagerUtil.getDefaultUser(company.getCompanyId());
-		}
-		catch (NoSuchUserException nsue) {
-			defaultUser = UserUtil.create(User.getDefaultUserId(company.getCompanyId()));
-
-			Date now = new Date();
-
-			defaultUser.setCompanyId(User.DEFAULT);
-			defaultUser.setCreateDate(now);
-			defaultUser.setPassword("password");
-			defaultUser.setFirstName(StringPool.BLANK);
-			defaultUser.setMiddleName(StringPool.BLANK);
-			defaultUser.setLastName(StringPool.BLANK);
-			defaultUser.setMale(true);
-			defaultUser.setBirthday(now);
-			defaultUser.setEmailAddress(User.DEFAULT + "@" + company.getMx());
-
-			defaultUser.setLanguageId(null);
-			defaultUser.setTimeZoneId(null);
-//			defaultUser.setSkinId(Skin.DEFAULT_SKIN_ID);
-			defaultUser.setDottedSkins(false);
-			defaultUser.setRoundedSkins(false);
-			defaultUser.setGreeting("Welcome!");
-			defaultUser.setResolution(
-				PropsUtil.get(PropsUtil.DEFAULT_GUEST_LAYOUT_RESOLUTION));
-			defaultUser.setRefreshRate(
-				PropsUtil.get(PropsUtil.DEFAULT_USER_LAYOUT_REFRESH_RATE));
-			defaultUser.setLoginDate(now);
-			defaultUser.setFailedLoginAttempts(0);
-			defaultUser.setAgreedToTermsOfUse(false);
-			defaultUser.setActive(true);
-
-			UserUtil.update(defaultUser);
-		}
-		return defaultUser;
-	}
 	
-	public void checkCompany(String companyId)
-		throws PortalException, SystemException {
-
-		// Company
-
-		Company company = null;
-
-		try {
-			company = CompanyUtil.findByPrimaryKey(companyId);
-		}
-		catch (NoSuchCompanyException nsce) {
-			company = CompanyUtil.create(companyId);
-
-			company.setPortalURL("localhost");
-			company.setHomeURL("localhost");
-			company.setMx(companyId);
-			company.setName(companyId);
-			company.setShortName(companyId);
-			company.setType("biz");
-			company.setEmailAddress("test@" + companyId);
-			company.setAuthType(Company.AUTH_TYPE_EA);
-			company.setAutoLogin(true);
-			company.setStrangers(true);
-
-			CompanyUtil.update(company);
-		}
-
-		// Key
-
-		checkCompanyKey(companyId);
-
-		// Groups
-
-//		GroupLocalManagerUtil.checkSystemGroups(companyId);
-
-		// Roles
-
-//		RoleLocalManagerUtil.checkSystemRoles(companyId);
-
-		// Default admin
-		User defaultUser = createDefaultUser(company); 
-
-		if (countUsers(companyId) == 0) {
-			Date now = new Date();
-
-			User user = UserLocalManagerUtil.addUser(
-				companyId, true, StringPool.BLANK, false, "test", "test", false,
-				"Test", StringPool.BLANK, "Test", StringPool.BLANK, true, now,
-				"test@" + company.getMx(), defaultUser.getLocale());
-
-			Role adminRole;
-			try {
-				adminRole = APILocator.getRoleAPI().loadRoleByKey("Administrator");
-			} catch (DotDataException e) {
-				Logger.error(CompanyLocalManagerImpl.class,e.getMessage(),e);
-				throw new SystemException(e);
-			}
-
-			String[] roleIds = new String[] {adminRole.getId()};
-
-			for (String roleId : roleIds) {
-				try {
-					APILocator.getRoleAPI().addRoleToUser(roleId, user);
-				} catch (DotStateException e) {
-					Logger.error(CompanyLocalManagerImpl.class,e.getMessage(),e);
-				} catch (DotDataException e) {
-					Logger.error(CompanyLocalManagerImpl.class,e.getMessage(),e);
-				}	
-			}
-			
-		}
-	}
+//	public void checkCompany(String companyId)
+//		throws PortalException, SystemException {
+//
+//		// Company
+//
+//		Company company = null;
+//
+//		try {
+//			company = CompanyUtil.findByPrimaryKey(companyId);
+//		}
+//		catch (NoSuchCompanyException nsce) {
+//			company = CompanyUtil.create(companyId);
+//
+//			company.setPortalURL("localhost");
+//			company.setHomeURL("localhost");
+//			company.setMx(companyId);
+//			company.setName(companyId);
+//			company.setShortName(companyId);
+//			company.setType("biz");
+//			company.setEmailAddress("test@" + companyId);
+//			company.setAuthType(Company.AUTH_TYPE_EA);
+//			company.setAutoLogin(true);
+//			company.setStrangers(true);
+//
+//			CompanyUtil.update(company);
+//		}
+//
+//		// Key
+//
+//		checkCompanyKey(companyId);
+//
+//		// Groups
+//
+////		GroupLocalManagerUtil.checkSystemGroups(companyId);
+//
+//		// Roles
+//
+////		RoleLocalManagerUtil.checkSystemRoles(companyId);
+//
+//		// Default admin
+////		User defaultUser = createDefaultUser(company); 
+//
+////		if (countUsers(companyId) == 0) {
+////			Date now = new Date();
+////
+//////			User user = UserLocalManagerUtil.addUser(
+//////				companyId, true, StringPool.BLANK, false, "test", "test", false,
+//////				"Test", StringPool.BLANK, "Test", StringPool.BLANK, true, now,
+//////				"test@" + company.getMx(), defaultUser.getLocale());
+////
+////			Role adminRole;
+////			try {
+////				adminRole = APILocator.getRoleAPI().loadRoleByKey("Administrator");
+////			} catch (DotDataException e) {
+////				Logger.error(CompanyLocalManagerImpl.class,e.getMessage(),e);
+////				throw new SystemException(e);
+////			}
+////
+////			String[] roleIds = new String[] {adminRole.getId()};
+////
+////			for (String roleId : roleIds) {
+////				try {
+////					APILocator.getRoleAPI().addRoleToUser(roleId, user);
+////				} catch (DotStateException e) {
+////					Logger.error(CompanyLocalManagerImpl.class,e.getMessage(),e);
+////				} catch (DotDataException e) {
+////					Logger.error(CompanyLocalManagerImpl.class,e.getMessage(),e);
+////				}	
+////			}
+////			
+////		}
+//	}
 
 	public void checkCompanyKey(String companyId)
 		throws PortalException, SystemException {
@@ -189,7 +144,12 @@ public class CompanyLocalManagerImpl implements CompanyLocalManager {
 	}
 
 	public int countUsers(String companyId) throws SystemException {
-		return UserUtil.countByCompanyId(companyId);
+		try {
+			return APILocator.getUserAPI().countUsers();
+		} catch (DotDataException e) {
+			Logger.error(CompanyLocalManagerImpl.class,e.getMessage(),e);
+			throw new SystemException(e);
+		}
 	}
 
 	public List getCompanies() throws SystemException {
@@ -201,15 +161,4 @@ public class CompanyLocalManagerImpl implements CompanyLocalManager {
 
 		return CompanyUtil.findByPrimaryKey(companyId);
 	}
-
-	public List getUsers(String companyId) throws SystemException {
-		return UserUtil.findByCompanyId(companyId);
-	}
-
-	public List getUsers(String companyId, int begin, int end)
-		throws SystemException {
-
-		return UserUtil.findByCompanyId(companyId, begin, end);
-	}
-
 }

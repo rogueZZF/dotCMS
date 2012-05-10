@@ -26,7 +26,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.liferay.portal.ejb.UserManagerUtil;
+import com.dotmarketing.business.APILocator;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.util.CookieKeys;
 import com.liferay.portal.util.PortalUtil;
@@ -74,8 +74,7 @@ public class BasicAutoLogin implements AutoLogin {
 				KeyValuePair kvp = null;
 				
 				if (company.isAutoLogin()) {
-					kvp = UserManagerUtil.decryptUserId(
-						company.getCompanyId(), autoUserId, autoPassword);
+					kvp = APILocator.getUserAPI().decryptUserId(autoUserId, autoPassword);
 
 					credentials = new String[3];
 

@@ -24,6 +24,8 @@ package com.liferay.portal.ejb;
 
 import com.dotmarketing.business.APILocator;
 import com.dotmarketing.business.Role;
+import com.dotmarketing.exception.DotDataException;
+import com.dotmarketing.exception.DotSecurityException;
 import com.dotmarketing.util.Logger;
 import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.PortalException;
@@ -48,7 +50,15 @@ public class PrincipalBean {
 	public com.liferay.portal.model.User getUser()
 		throws NoSuchUserException, SystemException, PrincipalException {
 
-		return UserUtil.findByPrimaryKey(getUserId());
+		try {
+			return APILocator.getUserAPI().loadUserById(getUserId(), APILocator.getUserAPI().getSystemUser(), true);
+		} catch (com.dotmarketing.business.NoSuchUserException e) {
+			Logger.error(PrincipalBean.class,e.getMessage(),e);
+			throw new NoSuchUserException(e);
+		} catch (Exception e) {
+			Logger.error(PrincipalBean.class,e.getMessage(),e);
+			throw new SystemException(e);
+		}
 	}
 
 	public String getUserId() throws PrincipalException {

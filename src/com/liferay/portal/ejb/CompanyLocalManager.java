@@ -22,8 +22,6 @@
 
 package com.liferay.portal.ejb;
 
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.User;
 
 /**
  * <a href="CompanyLocalManager.java.html"><b><i>View Source</i></b></a>
@@ -34,13 +32,10 @@ import com.liferay.portal.model.User;
  */
 public interface CompanyLocalManager {
 	
-	public User createDefaultUser(Company company)
-	throws com.liferay.portal.PortalException, 
-		com.liferay.portal.SystemException;
-	
-	public void checkCompany(java.lang.String companyId)
-		throws com.liferay.portal.PortalException, 
-			com.liferay.portal.SystemException;
+//
+//	public void checkCompany(java.lang.String companyId)
+//		throws com.liferay.portal.PortalException, 
+//			com.liferay.portal.SystemException;
 
 	public void checkCompanyKey(java.lang.String companyId)
 		throws com.liferay.portal.PortalException, 
@@ -57,9 +52,4 @@ public interface CompanyLocalManager {
 		throws com.liferay.portal.PortalException, 
 			com.liferay.portal.SystemException;
 
-	public java.util.List getUsers(java.lang.String companyId)
-		throws com.liferay.portal.SystemException;
-
-	public java.util.List getUsers(java.lang.String companyId, int begin,
-		int end) throws com.liferay.portal.SystemException;
 }

@@ -10,14 +10,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.dotmarketing.beans.Host;
 import com.dotmarketing.business.APILocator;
 import com.dotmarketing.business.Layout;
 import com.dotmarketing.business.Role;
 import com.dotmarketing.business.RoleAPI;
-import com.dotmarketing.business.web.HostWebAPI;
-import com.dotmarketing.business.web.UserWebAPI;
-import com.dotmarketing.business.web.WebAPILocator;
 import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
 import com.liferay.portal.auth.PrincipalThreadLocal;
@@ -106,24 +102,7 @@ public class LoginAsAction extends Action {
 
 		
 			try{
-				HostWebAPI hostWebAPI  = WebAPILocator.getHostWebAPI();
-				UserWebAPI userWebAPI = WebAPILocator.getUserWebAPI();
-				User systemUser = userWebAPI.getSystemUser();
-				boolean respectFrontendRoles = !userWebAPI.isLoggedToBackend(req);
-				String serverName = req.getServerName();
-				Host host = null;
-				if (UtilMethods.isSet(serverName)) {
-				host = hostWebAPI.findByName(serverName, systemUser, respectFrontendRoles);
-				if(host == null)
-					host = hostWebAPI.findByAlias(serverName, systemUser, respectFrontendRoles);
-				//If no host matches then we return the default host
-				if(host == null)
-					host = hostWebAPI.findDefaultHost(systemUser, respectFrontendRoles);
-				} else {
-					host = hostWebAPI.findDefaultHost(systemUser, respectFrontendRoles);
-				}
-				req.getSession().setAttribute(com.dotmarketing.util.WebKeys.CURRENT_HOST, host);
-			
+				req.getSession().removeAttribute(com.dotmarketing.util.WebKeys.CMS_SELECTED_HOST_ID);
 				List<Layout> layouts = APILocator.getLayoutAPI().loadLayoutsForUser(loginAsUser);
 				PortletURLImpl portletURLImp = new PortletURLImpl(req, layouts.get(0).getPortletIds().get(0), layouts.get(0).getId(), false);
 				res.sendRedirect(portletURLImp.toString());

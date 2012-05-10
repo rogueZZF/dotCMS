@@ -107,8 +107,4 @@ public class LastModifiedCSS implements Cachable{
     private DotCacheAdministrator _cache = CacheLocator.getCacheAdministrator();
 	
 	private static LastModifiedCSS _instance = new LastModifiedCSS();
-
-	public void clearCache() {
-		clear();
-	}
 }

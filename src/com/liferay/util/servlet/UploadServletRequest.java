@@ -110,9 +110,6 @@ public class UploadServletRequest extends HttpServletRequestWrapper {
 				}
 
 				_params.put(fileItem.getFieldName(), fileItems);
-				if(fileItem.getFileName() != null)
-					_params.put(fileItem.getFileName(), new LiferayFileItem[] {fileItem});
-				
 			}
 		}
 		catch (FileUploadException fue) {

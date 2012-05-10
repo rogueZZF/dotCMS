@@ -22,10 +22,6 @@
 
 package com.liferay.portal.ejb;
 
-import com.liferay.portal.PortalException;
-import com.liferay.portal.SystemException;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.User;
 
 /**
  * <a href="CompanyLocalManagerUtil.java.html"><b><i>View Source</i></b></a>
@@ -35,40 +31,25 @@ import com.liferay.portal.model.User;
  *
  */
 public class CompanyLocalManagerUtil {
+
 	
-	public static User createDefaultUser(Company company) throws PortalException, SystemException{
-		try {
-			CompanyLocalManager companyLocalManager = CompanyLocalManagerFactory.getManager();
-			return companyLocalManager.createDefaultUser(company);
-		}
-		catch (com.liferay.portal.PortalException pe) {
-			throw pe;
-		}
-		catch (com.liferay.portal.SystemException se) {
-			throw se;
-		}
-		catch (Exception e) {
-			throw new com.liferay.portal.SystemException(e);
-		}
-	}
-	
-	public static void checkCompany(java.lang.String companyId)
-		throws com.liferay.portal.PortalException, 
-			com.liferay.portal.SystemException {
-		try {
-			CompanyLocalManager companyLocalManager = CompanyLocalManagerFactory.getManager();
-			companyLocalManager.checkCompany(companyId);
-		}
-		catch (com.liferay.portal.PortalException pe) {
-			throw pe;
-		}
-		catch (com.liferay.portal.SystemException se) {
-			throw se;
-		}
-		catch (Exception e) {
-			throw new com.liferay.portal.SystemException(e);
-		}
-	}
+//	public static void checkCompany(java.lang.String companyId)
+//		throws com.liferay.portal.PortalException, 
+//			com.liferay.portal.SystemException {
+//		try {
+//			CompanyLocalManager companyLocalManager = CompanyLocalManagerFactory.getManager();
+////			companyLocalManager.checkCompany(companyId);
+//		}
+////		catch (com.liferay.portal.PortalException pe) {
+////			throw pe;
+////		}
+////		catch (com.liferay.portal.SystemException se) {
+////			throw se;
+////		}
+//		catch (Exception e) {
+//			throw new com.liferay.portal.SystemException(e);
+//		}
+//	}
 
 	public static void checkCompanyKey(java.lang.String companyId)
 		throws com.liferay.portal.PortalException, 

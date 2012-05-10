@@ -62,7 +62,6 @@ import com.liferay.portal.auth.PrincipalFinder;
 import com.liferay.portal.auth.PrincipalThreadLocal;
 import com.liferay.portal.ejb.CompanyLocalManagerUtil;
 import com.liferay.portal.ejb.PortletManagerUtil;
-import com.liferay.portal.ejb.UserManagerUtil;
 import com.liferay.portal.events.EventsProcessor;
 import com.liferay.portal.events.StartupAction;
 import com.liferay.portal.job.JobScheduler;
@@ -195,11 +194,11 @@ public class MainServlet extends ActionServlet {
 
 			// Check company
 
-			try {
-				CompanyLocalManagerUtil.checkCompany(_companyId);
-			} catch (Exception e) {
-				Logger.error(this, e.getMessage(), e);
-			}
+//			try {
+//				CompanyLocalManagerUtil.checkCompany(_companyId);
+//			} catch (Exception e) {
+//				Logger.error(this, e.getMessage(), e);
+//			}
 
 			// Check web settings
 
@@ -292,7 +291,7 @@ public class MainServlet extends ActionServlet {
 
 			return;
 		}
-		req.setAttribute("dotcache", "no");
+
 		// Shared session
 
 		HttpSession ses = req.getSession();
@@ -468,14 +467,56 @@ public class MainServlet extends ActionServlet {
 		// Login
 
 		String userId = PortalUtil.getUserId(req);
+		String remoteUser = req.getRemoteUser();
 
-		if ((userId != null)) {
-			PrincipalThreadLocal.setName(userId);			
+		if ((userId != null) || (remoteUser != null)) {
+
+			// Set the principal associated with this thread
+
+			String name = userId;
+			if (remoteUser != null) {
+				name = remoteUser;
+			}
+
+			if (userId != null)
+				PrincipalThreadLocal.setName(userId);
+			else
+				PrincipalThreadLocal.setName(name);
+
 		}
 
-		if (userId == null) {
+		if ((userId == null) && (remoteUser != null)) {
 			try {
-				User user = UserManagerUtil.getDefaultUser(companyId);
+
+				// User id
+
+				userId = remoteUser;
+
+				try {
+					PrincipalFinder principalFinder = (PrincipalFinder) InstancePool.get(PropsUtil.get(PropsUtil.PRINCIPAL_FINDER));
+
+					userId = principalFinder.toLiferay(userId);
+				} catch (Exception e) {
+				}
+
+				// Pre login events
+
+				EventsProcessor.process(PropsUtil.getArray(PropsUtil.LOGIN_EVENTS_PRE), req, res);
+
+				ses.setAttribute(WebKeys.USER_ID, userId);
+
+				// User locale
+
+
+				// Post login events
+
+				EventsProcessor.process(PropsUtil.getArray(PropsUtil.LOGIN_EVENTS_POST), req, res);
+			} catch (Exception e) {
+				Logger.error(this, e.getMessage(), e);
+			}
+		} else if (userId == null) {
+			try {
+				User user = APILocator.getUserAPI().getSystemUser();
 				if(ses.getAttribute(Globals.LOCALE_KEY)==null)
 					ses.setAttribute(Globals.LOCALE_KEY, user.getLocale());
 

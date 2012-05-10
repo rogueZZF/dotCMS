@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.liferay.portal.ejb.UserLocalManagerUtil;
+import com.dotmarketing.business.APILocator;
 import com.liferay.portal.model.User;
 
 /**
@@ -52,7 +52,7 @@ public class CASAutoLogin implements AutoLogin {
 			String userId = (String)ses.getAttribute(CAS_FILTER_USER);
 
 			if (userId != null) {
-				User user = UserLocalManagerUtil.getUserById(userId);
+				User user = APILocator.getUserAPI().loadUserById(userId, APILocator.getUserAPI().getSystemUser(), true);
 
 				credentials = new String[3];
 
