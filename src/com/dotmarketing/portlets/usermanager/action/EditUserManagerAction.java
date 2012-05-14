@@ -30,7 +30,6 @@ import com.dotmarketing.business.APILocator;
 import com.dotmarketing.business.NoSuchUserException;
 import com.dotmarketing.business.PermissionAPI;
 import com.dotmarketing.business.web.WebAPILocator;
-import com.dotmarketing.cms.factories.PublicAddressFactory;
 import com.dotmarketing.cms.factories.PublicEncryptionFactory;
 import com.dotmarketing.db.HibernateUtil;
 import com.dotmarketing.factories.EmailFactory;
@@ -173,12 +172,10 @@ public class EditUserManagerAction extends DotPortletAction{
 								userId = _save(form, req, res);
 
 								User user = retrieveMember(userId, userForm);
-								Address address = retrieveAddress(user.getUserId());
 								UserProxy userProxy = com.dotmarketing.business.APILocator.getUserProxyAPI().getUserProxy(user,APILocator.getUserAPI().getSystemUser(), false);
 
 								UserManagerListSearchForm searchForm = new UserManagerListSearchForm();
 								BeanUtils.copyProperties(searchForm, user);
-								BeanUtils.copyProperties(searchForm, address);
 								BeanUtils.copyProperties(searchForm, userProxy);
 
 								if(UtilMethods.isSet(httpReq.getSession().getAttribute(WebKeys.WEBEVENTS_REG_USER))){
@@ -276,8 +273,6 @@ public class EditUserManagerAction extends DotPortletAction{
 			// Retriving info from db
 			UserProxy userProxy = com.dotmarketing.business.APILocator.getUserProxyAPI().getUserProxy(user,APILocator.getUserAPI().getSystemUser(), false);
 
-			Address address = retrieveAddress(user.getUserId());
-
 			// Copy the attributes
 			BeanUtils.copyProperties(form, user);
 
@@ -286,12 +281,6 @@ public class EditUserManagerAction extends DotPortletAction{
 			}
 
 			BeanUtils.copyProperties(form, userProxy);
-
-			if(!UtilMethods.isSet(address.getDescription())){
-				address.setDescription("other");
-			}
-
-			BeanUtils.copyProperties(form, address);
 
 			// Extra user info
 			userForm.setUserID(user.getUserId());
@@ -309,35 +298,8 @@ public class EditUserManagerAction extends DotPortletAction{
 					userProxy.addChild(cat);
 				}
 			}
-			BeanUtils.copyProperties(form, address);
-
-			BeanUtils.copyProperties(form, address);
-
 		}
 
-	}
-
-	private Address retrieveAddress(String userID) throws Exception {
-		String companyId = com.dotmarketing.cms.factories.PublicCompanyFactory.getDefaultCompany().getCompanyId();
-
-		Address address = null;
-		if (UtilMethods.isSet(userID)) {
-			List addresses = PublicAddressFactory.getAddressesByUserId(userID);
-			if (addresses.size() == 0) {
-				address = PublicAddressFactory.getInstance();
-				address.setCompanyId(companyId);
-				address.setUserId(userID);
-			} else {
-				address = (Address) addresses.get(0);
-			}
-		} else {
-			address = PublicAddressFactory.getInstance();
-			address.setCompanyId(companyId);
-			address.setCreateDate(new java.util.Date());
-			address.setNew(true);
-			address.setUserId(userID);
-		}
-		return address;
 	}
 
 	//Deleting User manager
@@ -453,27 +415,6 @@ public class EditUserManagerAction extends DotPortletAction{
 			com.dotmarketing.business.APILocator.getUserProxyAPI().saveUserProxy(userProxy,APILocator.getUserAPI().getSystemUser(), false);
 
 		}
-
-		//Saving User Address Information
-		Address address = retrieveAddress(user.getUserId());
-
-		address.setUserName(user.getFullName());
-		address.setClassName(user.getClass().getName());
-		address.setClassPK(user.getUserId());
-		address.setDescription(userForm.getDescription());
-		address.setStreet1(userForm.getStreet1());
-		address.setStreet2(userForm.getStreet2());
-		address.setCity(userForm.getCity());
-		address.setState(userForm.getState());
-		address.setZip(userForm.getZip());
-		address.setPhone(userForm.getPhone());
-		address.setFax(userForm.getFax());
-
-		if (userForm.getCountry() != null)
-			address.setCountry(userForm.getCountry());
-
-		address.setCell(userForm.getCell());
-		PublicAddressFactory.save(address);
 
 		//		Add User Categories
 		if(userForm.getCategory() != null){

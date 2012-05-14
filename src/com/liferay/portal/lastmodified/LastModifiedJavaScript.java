@@ -109,4 +109,9 @@ public class LastModifiedJavaScript implements Cachable{
 	private static LastModifiedJavaScript _instance =
 		new LastModifiedJavaScript();
 
+	@Override
+	public void clearCache() {
+		_cache.flushGroup(primaryGroup);
+	}
+
 }

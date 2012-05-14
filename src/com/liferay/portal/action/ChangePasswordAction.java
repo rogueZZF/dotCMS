@@ -32,6 +32,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.dotmarketing.business.APILocator;
 import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.UserPasswordException;
 import com.liferay.portal.auth.PrincipalException;
@@ -107,9 +108,8 @@ public class ChangePasswordAction extends Action {
 
 		User user = PortalUtil.getSelectedUser(req);
 
-		PortalUtil.updateUser(
-			req, res, user.getUserId(), password1, password2, passwordReset);
-
+		APILocator.getUserAPI().resetPassword(user.getUserId(), password1, password2);
+		
 		if (user.getUserId().equals(PortalUtil.getUser(req).getUserId())) {
 			ses.setAttribute(WebKeys.USER_PASSWORD, password1);
 		}

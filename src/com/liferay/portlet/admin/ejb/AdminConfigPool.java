@@ -154,4 +154,9 @@ public class AdminConfigPool implements Cachable {
 	
 	private static AdminConfigPool _instance;
 	private boolean _cacheable;
+	
+	@Override
+	public void clearCache() {
+		_cache.flushGroup(primaryGroup);
+	}
 }

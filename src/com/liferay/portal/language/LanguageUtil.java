@@ -23,6 +23,8 @@
 package com.liferay.portal.language;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -34,6 +36,10 @@ import org.apache.struts.Globals;
 import org.apache.struts.taglib.TagUtils;
 import org.apache.struts.util.MessageResources;
 
+import com.dotmarketing.business.APILocator;
+import com.dotmarketing.cms.factories.PublicCompanyFactory;
+import com.dotmarketing.util.Logger;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.WebAppPool;
@@ -55,14 +61,59 @@ public class LanguageUtil {
 	public static final String DEFAULT_ENCODING = "UTF-8";
 
 	public static String get(User user, String key) throws LanguageException {
-		return get(user.getCompanyId(), user.getLocale(), key);
+		
+		
+		if(user ==null){
+			try{
+				user = APILocator.getUserAPI().getDefaultUser();
+			}
+			catch(Exception e){
+				Logger.error(LanguageUtil.class, "cannot find default user");
+			}
+		}
+		
+		String companyId=(user.getCompanyId()==null) ? PublicCompanyFactory.getDefaultCompanyId() : user.getCompanyId();
+		
+		return get(companyId, user.getLocale(), key);
 	}
-
+	public static String get(Locale locale, String key) throws LanguageException {
+		return get(PublicCompanyFactory.getDefaultCompanyId(), locale, key);
+	}
+	
+	public static String get(Company company, String key)
+	throws LanguageException {
+		if(company ==null){
+			return null;
+		}
+		String value = null;
+		Logger.debug(LanguageUtil.class, key);
+		try {
+			MessageResources resources = (MessageResources)WebAppPool.get(
+				company.getCompanyId(), Globals.MESSAGES_KEY);
+			
+			if (resources != null)
+				value = resources.getMessage(company.getLocale(), key);
+		}
+		catch (Exception e) {
+			throw new LanguageException(e);
+		}
+	
+		if (value == null) {
+			Logger.warn(LanguageUtil.class, key);
+			value = key;
+		}
+	
+		return value;
+	}
+	
+	
+	
+	
 	public static String get(String companyId, Locale locale, String key)
 		throws LanguageException {
 
 		String value = null;
-
+		Logger.debug(LanguageUtil.class, key);
 		try {
 			MessageResources resources = (MessageResources)WebAppPool.get(
 				companyId, Globals.MESSAGES_KEY);
@@ -75,6 +126,7 @@ public class LanguageUtil {
 		}
 
 		if (value == null) {
+			Logger.warn(LanguageUtil.class, key);
 			value = key;
 		}
 
@@ -83,7 +135,7 @@ public class LanguageUtil {
 
 	public static String get(PageContext pageContext, String key)
 		throws LanguageException {
-
+		Logger.debug(LanguageUtil.class, key);
 		String value = null;
 
 		try {
@@ -97,6 +149,7 @@ public class LanguageUtil {
 		}
 
 		if (value == null) {
+			Logger.warn(LanguageUtil.class, key);
 			value = key;
 		}
 
@@ -121,6 +174,13 @@ public class LanguageUtil {
 
 		return format(pageContext, pattern, new Object[] {argument}, true);
 	}
+	
+	public static String format(
+			Locale locale, String pattern, Object argument)
+		throws LanguageException {
+
+		return format(locale, pattern, new Object[] {argument}, true);
+	}
 
 	public static String format(
 			PageContext pageContext, String pattern, Object argument,
@@ -130,7 +190,16 @@ public class LanguageUtil {
 		return format(
 			pageContext, pattern, new Object[] {argument}, translateArguments);
 	}
+	
+	public static String format(
+			Locale locale, String pattern, Object argument,
+			boolean translateArguments)
+		throws LanguageException {
 
+		return format(
+				locale, pattern, new Object[] {argument}, translateArguments);
+	}
+	
 	public static String format(
 			PageContext pageContext, String pattern, Object[] arguments)
 		throws LanguageException {
@@ -144,9 +213,12 @@ public class LanguageUtil {
 		throws LanguageException {
 
 		String value = null;
-
+		String pattern2 = get(pageContext, pattern);
+		if(!pattern.equals(pattern2)){
+			pattern = pattern2;
+		}
 		try {
-			pattern = get(pageContext, pattern);
+			Logger.warn(LanguageUtil.class, pattern);
 
 			if (arguments != null) {
 				Object[] formattedArguments = new Object[arguments.length];
@@ -164,6 +236,7 @@ public class LanguageUtil {
 				value = MessageFormat.format(pattern, formattedArguments);
 			}
 			else {
+				Logger.warn(LanguageUtil.class, pattern);
 				value = pattern;
 			}
 		}
@@ -173,7 +246,69 @@ public class LanguageUtil {
 
 		return value;
 	}
+	
+	public static String format(
+			Locale locale, String pattern, String[] arguments) throws LanguageException{
+		
+		List<LanguageWrapper> lw = new ArrayList<LanguageWrapper>();
+		for(int i=0;i< arguments.length;i++){
+			
+			lw.add(new LanguageWrapper("", arguments[i], ""));
+		}
+		
+		
+		
+		
+		
+		
+		return format(locale, pattern, (LanguageWrapper[]) lw.toArray(new LanguageWrapper[lw.size()]),false); 
+	}
+	
+	
+	
+	
+	public static String format(
+			Locale locale, String pattern, Object[] arguments,
+			boolean translateArguments)
+		throws LanguageException {
 
+		String value = null;
+		User fakeUser = new User();
+//		fakeUser.setLocale(locale);
+		String pattern2 = get(fakeUser, pattern);
+		if(!pattern.equals(pattern2)){
+			pattern = pattern2;
+		}
+		try {
+			Logger.warn(LanguageUtil.class, pattern);
+
+			if (arguments != null) {
+				Object[] formattedArguments = new Object[arguments.length];
+
+				for (int i = 0; i < arguments.length; i++) {
+					if (translateArguments) {
+						formattedArguments[i] =
+							get(fakeUser, arguments[i].toString());
+					}
+					else {
+						formattedArguments[i] = arguments[i];
+					}
+				}
+
+				value = MessageFormat.format(pattern, formattedArguments);
+			}
+			else {
+				Logger.warn(LanguageUtil.class, pattern);
+				value = pattern;
+			}
+		}
+		catch (Exception e) {
+			throw new LanguageException(e);
+		}
+
+		return value;
+	}
+	
 	public static String format(
 			PageContext pageContext, String pattern, LanguageWrapper argument)
 		throws LanguageException {
@@ -181,7 +316,14 @@ public class LanguageUtil {
 		return format(
 			pageContext, pattern, new LanguageWrapper[] {argument}, true);
 	}
+	public static String format(
+			Locale locale, String pattern, LanguageWrapper argument)
+		throws LanguageException {
 
+		return format(
+				locale, pattern, new LanguageWrapper[] {argument}, true);
+	}
+	
 	public static String format(
 			PageContext pageContext, String pattern, LanguageWrapper argument,
 			boolean translateArguments)
@@ -208,7 +350,10 @@ public class LanguageUtil {
 		String value = null;
 
 		try {
-			pattern = get(pageContext, pattern);
+			String pattern2 = get(pageContext, pattern);
+			if(!pattern.equals(pattern2)){
+				pattern = pattern2;
+			}
 
 			if (arguments != null) {
 				Object[] formattedArguments = new Object[arguments.length];

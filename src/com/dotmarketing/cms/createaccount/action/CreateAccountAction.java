@@ -20,7 +20,6 @@ import com.dotmarketing.business.NoSuchUserException;
 import com.dotmarketing.business.Role;
 import com.dotmarketing.business.UserAPI;
 import com.dotmarketing.cms.createaccount.struts.CreateAccountForm;
-import com.dotmarketing.cms.factories.PublicAddressFactory;
 import com.dotmarketing.cms.factories.PublicCompanyFactory;
 import com.dotmarketing.cms.factories.PublicEncryptionFactory;
 import com.dotmarketing.cms.login.action.LoginAction;
@@ -236,25 +235,7 @@ public class CreateAccountAction extends DispatchAction {
 				UtilMethods.isSet(createAccountForm.getPhone()) ||
 				UtilMethods.isSet(createAccountForm.getFax()) ||
 				UtilMethods.isSet(createAccountForm.getCell())) {
-			try {
-				List<Address> addresses = PublicAddressFactory.getAddressesByUserId(user.getUserId());
-				Address address = (addresses.size() > 0 ? addresses.get(0) : PublicAddressFactory.getInstance());
-				address.setDescription(createAccountForm.getDescription() == null ? "" : createAccountForm.getDescription());
-				address.setStreet1(createAccountForm.getStreet1() == null ? "" : createAccountForm.getStreet1());
-				address.setStreet2(createAccountForm.getStreet2() == null ? "" : createAccountForm.getStreet2());
-				address.setCity(createAccountForm.getCity() == null ? "" : createAccountForm.getCity());
-				address.setState(createAccountForm.getState() == null ? "" : createAccountForm.getState());
-				address.setZip(createAccountForm.getZip() == null ? "" : createAccountForm.getZip());
-				address.setCountry(createAccountForm.getCountry() == null ? "" : createAccountForm.getCountry());
-				address.setPhone(createAccountForm.getPhone() == null ? "" : createAccountForm.getPhone());
-				address.setFax(createAccountForm.getFax() == null ? "" : createAccountForm.getFax());
-				address.setCell( createAccountForm.getCell() == null ? "" :  createAccountForm.getCell());
-				address.setUserId(user.getUserId());
-				address.setCompanyId(company.getCompanyId());
-				PublicAddressFactory.save(address);
-			} catch (Exception e) {
-				Logger.warn(this, e.toString());
-			}
+			
 		}
 
 		userProxy.setMailSubscription(createAccountForm.isMailSubscription());
@@ -389,25 +370,6 @@ public class CreateAccountAction extends DispatchAction {
 			createAccountForm.setVar25(userProxy.getVar25());
 			//### END LOAD USER_PROXY ###
 
-			try{
-				List<Address> addresses = PublicAddressFactory.getAddressesByUserId(user.getUserId());
-				if(addresses.size() > 0){
-					Address address = addresses.get(0);
-					createAccountForm.setDescription(address.getDescription());
-					createAccountForm.setStreet1(address.getStreet1());
-					createAccountForm.setStreet2(address.getStreet2());
-					createAccountForm.setCity(address.getCity());
-					createAccountForm.setState(address.getState());
-					createAccountForm.setZip(address.getZip());
-					createAccountForm.setCountry(address.getCountry());
-					createAccountForm.setPhone(address.getPhone());
-					createAccountForm.setFax(address.getFax());
-					createAccountForm.setCell( address.getCell() );
-
-				}
-			} catch (Exception e) {
-				Logger.warn(this, e.toString());
-			}
 		}
 
 	}

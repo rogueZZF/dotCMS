@@ -38,7 +38,6 @@ import com.dotmarketing.business.CacheLocator;
 import com.dotmarketing.business.NoSuchUserException;
 import com.dotmarketing.business.PermissionAPI;
 import com.dotmarketing.business.Role;
-import com.dotmarketing.cms.factories.PublicAddressFactory;
 import com.dotmarketing.cms.factories.PublicCompanyFactory;
 import com.dotmarketing.cms.factories.PublicEncryptionFactory;
 import com.dotmarketing.db.HibernateUtil;
@@ -520,24 +519,11 @@ public class ViewUserManagerListAction extends DotPortletAction {
             user = APILocator.getUserAPI().loadUserById(userId,APILocator.getUserAPI().getSystemUser(),false);
 
             UserProxy userProxy = com.dotmarketing.business.APILocator.getUserProxyAPI().getUserProxy(user,APILocator.getUserAPI().getSystemUser(), false);
-
-            List<Address> addresses = user.getAddresses();
-            Address address = null;
-            if (addresses.size() > 0) {
-                address = (Address) addresses.get(0);
-            }
             matchesArray[i][0] = (userId == null) ? "" : userId;
             matchesArray[i][1] = (user.getFirstName() == null) ? "" : user.getFirstName();
             matchesArray[i][2] = (user.getMiddleName() == null) ? "" : user.getMiddleName();
             matchesArray[i][3] = (user.getLastName() == null) ? "" : user.getLastName();
             matchesArray[i][4] = (user.getEmailAddress() == null) ? "" : user.getEmailAddress();
-            matchesArray[i][5] = (address == null) ? "" : address.getStreet1();
-            matchesArray[i][6] = (address == null) ? "" : address.getStreet2();
-            matchesArray[i][7] = (address == null) ? "" : address.getCity();
-            matchesArray[i][8] = (address == null) ? "" : address.getState();
-            matchesArray[i][9] = (address == null) ? "" : address.getZip();
-            matchesArray[i][10] = (address == null) ? "" : address.getCountry();
-            matchesArray[i][11] = (address == null) ? "" : address.getPhone();
             matchesArray[i][12] = UtilMethods.htmlDateToHTMLTime(user.getCreateDate());
 
             if (!isUserManagerAdmin) {
@@ -670,13 +656,7 @@ public class ViewUserManagerListAction extends DotPortletAction {
                 } catch (ActionException ae) {
                     continue;
                 }
-
-                List addresses = user.getAddresses();
-                Address address = null;
-                if (addresses.size() > 0) {
-                    address = (Address) addresses.get(0);
-                }
-
+                
                 matchesArray[i][0] = userId;
                 matchesArray[i][1] = (user.getFirstName() == null) ? "" : user.getFirstName();
                 matchesArray[i][2] = (user.getMiddleName() == null) ? "" : user.getMiddleName();
@@ -684,16 +664,7 @@ public class ViewUserManagerListAction extends DotPortletAction {
                 matchesArray[i][4] = (user.getEmailAddress() == null) ? "" : user.getEmailAddress();
                 matchesArray[i][5] = (user.getPassword() == null) ? "" : user.getPassword();
                 matchesArray[i][6] = UtilMethods.htmlDateToHTMLTime(user.getBirthday());
-                matchesArray[i][7] = (address == null) ? "" : address.getStreet1();
-                matchesArray[i][8] = (address == null) ? "" : address.getStreet2();
-                matchesArray[i][9] = (address == null) ? "" : address.getCity();
-                matchesArray[i][10] = (address == null) ? "" : address.getState();
-                matchesArray[i][11] = (address == null) ? "" : address.getZip();
-                matchesArray[i][12] = (address == null) ? "" : address.getCountry();
-                matchesArray[i][13] = (address == null) ? "" : address.getPhone();
-                matchesArray[i][14] = (address == null) ? "" : address.getFax();
-                matchesArray[i][15] = (address == null) ? "" : address.getCell();
-
+               
                 for (int j = 1; j <= numberGenericVariables; j++) {
                     matchesArray[i][15 + j] = (userProxy.getVar(j) == null) ? "" : userProxy.getVar(j);
                 }
@@ -1107,28 +1078,6 @@ public class ViewUserManagerListAction extends DotPortletAction {
 
                                 Date today = new Date();
 
-                                Address address = PublicAddressFactory.getInstance();
-                                address.setUserName(user.getFullName());
-                                address.setCompanyId(companyId);
-                                address.setUserId(user.getUserId());
-                                address.setCreateDate(today);
-                                address.setModifiedDate(today);
-                                address.setPriority(1);
-                                address.setClassName(user.getClass().getName());
-                                address.setClassPK(user.getUserId());
-                                address.setDescription("Primary");
-                                address.setStreet1(street1);
-                                address.setStreet2(street2);
-                                address.setCountry(country);
-                                address.setCity(city);
-                                address.setState(state);
-                                address.setZip(zip);
-                                address.setPhone(phone);
-                                address.setFax(fax);
-                                address.setCell(cell);
-
-                                PublicAddressFactory.save(address);
-
                                 // creating tag users
                                 if (UtilMethods.isSet(userForm.getTagName())) {
                                     StringTokenizer tagNameToken = new StringTokenizer(userForm.getTagName(), ",");
@@ -1213,69 +1162,8 @@ public class ViewUserManagerListAction extends DotPortletAction {
                                         }
                                     }
 
-                                    Address address = null;
-                                    List<Address> addresses = PublicAddressFactory.getAddressesByUserId(userDuplicated.getUserId());
-                                    for (int pos = 0; pos < addresses.size(); ++pos) {
-                                        if ((addresses.get(pos).getDescription() != null) && (addresses.get(pos).getDescription().equals("Primary"))) {
-                                            address = addresses.get(pos);
-                                            break;
-                                        }
-                                    }
 
                                     Date today = new Date();
-
-                                    if (address == null) {
-                                        address = PublicAddressFactory.getInstance();
-                                        address.setUserName(userDuplicated.getFullName());
-                                        address.setCompanyId(companyId);
-                                        address.setUserId(userDuplicated.getUserId());
-                                        address.setCreateDate(today);
-                                        address.setModifiedDate(today);
-                                        address.setPriority(1);
-                                        address.setClassName(userDuplicated.getClass().getName());
-                                        address.setClassPK(userDuplicated.getUserId());
-                                        address.setDescription("Primary");
-                                        address.setStreet1(street1);
-                                        address.setStreet2(street2);
-                                        address.setCountry(country);
-                                        address.setCity(city);
-                                        address.setState(state);
-                                        address.setZip(zip);
-                                        address.setPhone(phone);
-                                        address.setFax(fax);
-                                        address.setCell(cell);
-                                    } else {
-                                        address.setModifiedDate(today);
-
-                                        if (UtilMethods.isSet(street1))
-                                            address.setStreet1(street1);
-
-                                        if (UtilMethods.isSet(street2))
-                                            address.setStreet2(street2);
-
-                                        if (UtilMethods.isSet(country))
-                                            address.setCountry(country);
-
-                                        if (UtilMethods.isSet(city))
-                                            address.setCity(city);
-
-                                        if (UtilMethods.isSet(state))
-                                            address.setState(state);
-
-                                        if (UtilMethods.isSet(zip))
-                                            address.setZip(zip);
-
-                                        if (UtilMethods.isSet(phone))
-                                            address.setPhone(phone);
-
-                                        if (UtilMethods.isSet(fax))
-                                            address.setFax(fax);
-
-                                        if (UtilMethods.isSet(cell))
-                                            address.setCell(cell);
-                                    }
-
-                                    PublicAddressFactory.save(address);
 
                                     for (String roleId : roles) {
                                         com.dotmarketing.business.APILocator.getRoleAPI().addRoleToUser(roleId, userDuplicated);

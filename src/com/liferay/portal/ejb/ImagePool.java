@@ -156,4 +156,9 @@ public class ImagePool implements Cachable{
     
 	private static ImagePool _instance;
 	private boolean _cacheable;
+	
+	@Override
+	public void clearCache() {
+		_cache.flushGroup(primaryGroup);
+	}
 }

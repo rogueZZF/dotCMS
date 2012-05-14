@@ -156,4 +156,9 @@ public class PasswordTrackerPool implements Cachable{
     private DotCacheAdministrator _cache = CacheLocator.getCacheAdministrator();
 	private static PasswordTrackerPool _instance;
 	private boolean _cacheable;
+
+	@Override
+	public void clearCache() {
+		_cache.flushGroup(primaryGroup);
+	}
 }

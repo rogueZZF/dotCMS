@@ -17,8 +17,6 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.dotmarketing.beans.UserProxy;
 import com.dotmarketing.business.APILocator;
-import com.dotmarketing.cms.factories.PublicAddressFactory;
-import com.dotmarketing.cms.factories.PublicCompanyFactory;
 import com.dotmarketing.cms.factories.PublicEncryptionFactory;
 import com.dotmarketing.cms.myaccount.struts.MyAccountForm;
 import com.dotmarketing.db.HibernateUtil;
@@ -161,30 +159,14 @@ public class MyAccountAction extends DispatchAction {
 
 		// Retriving info from db
 		UserProxy userProxy = com.dotmarketing.business.APILocator.getUserProxyAPI().getUserProxy(user,APILocator.getUserAPI().getSystemUser(), false);
-		Address address = null;
-		if (UtilMethods.isSet(form.getAddressID())) {
-			address = PublicAddressFactory.getAddressById(form.getAddressID());
-			if(address != null && address.getUserId() != null && !address.getUserId().equals(userId)){
-				address = null;
-			}
-		}
+		
 		int addrId = 0;
 		try{
 			addrId = Integer.parseInt(form.getAddressID());
 		}
 		catch(Exception e){}
 
-		if (addrId > 0) {
-			address = PublicAddressFactory.getAddressById(form.getAddressID());
-			if(address != null && address.getUserId() != null && !address.getUserId().equals(userId)){
-				address = null;
-			}
-		}
-		if (address == null) {
-			address = PublicAddressFactory.getInstance();
-			address.setUserId(userId);
-			address.setCompanyId(PublicCompanyFactory.getDefaultCompanyId());
-		}
+		
 		if (!InodeUtils.isSet(userProxy.getInode())) {
 			userProxy.setUserId(user.getUserId());
 			HibernateUtil.saveOrUpdate(userProxy);
@@ -192,7 +174,6 @@ public class MyAccountAction extends DispatchAction {
 
 		// Copy the attributes
 		BeanUtils.copyProperties(form, user);
-		BeanUtils.copyProperties(form, address);
 		BeanUtils.copyProperties(form, userProxy);
 
 		// Extra user info
@@ -357,30 +338,6 @@ public class MyAccountAction extends DispatchAction {
 			addrId = Integer.parseInt(form.getAddressID());
 		}
 		catch(Exception e){}
-
-		if (addrId > 0) {
-			address = PublicAddressFactory.getAddressById(form.getAddressID());
-			if(address != null && address.getUserId() != null && !address.getUserId().equals(userId)){
-				address = null;
-			}
-		}
-		if (address == null) {
-			address = PublicAddressFactory.getInstance();
-			address.setUserId(userId);
-			address.setCompanyId(PublicCompanyFactory.getDefaultCompanyId());
-		}
-
-		address.setDescription(form.getDescription());
-		address.setStreet1(form.getStreet1());
-		address.setStreet2(form.getStreet2());
-		address.setCity(form.getCity());
-		address.setCountry(form.getCountry());
-		address.setState(form.getState());
-		address.setZip(form.getZip());
-		address.setPhone(form.getPhone());
-		address.setFax(form.getFax());
-
-		PublicAddressFactory.save(address);
 
 		loadUserInfoInRequest(form, userId, request);
 

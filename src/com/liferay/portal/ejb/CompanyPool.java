@@ -153,4 +153,9 @@ public class CompanyPool implements Cachable{
 	
     private DotCacheAdministrator _cache = CacheLocator.getCacheAdministrator();
 	private boolean _cacheable;
+
+	@Override
+	public void clearCache() {
+		_cache.flushGroup(primaryGroup);
+	}
 }

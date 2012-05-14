@@ -3,7 +3,6 @@ package com.dotmarketing.cms.webforms.action;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -26,11 +25,9 @@ import com.dotmarketing.business.APILocator;
 import com.dotmarketing.business.Role;
 import com.dotmarketing.business.web.HostWebAPI;
 import com.dotmarketing.business.web.WebAPILocator;
-import com.dotmarketing.cms.factories.PublicAddressFactory;
 import com.dotmarketing.cms.factories.PublicCompanyFactory;
 import com.dotmarketing.cms.factories.PublicEncryptionFactory;
 import com.dotmarketing.db.HibernateUtil;
-import com.dotmarketing.exception.DotHibernateException;
 import com.dotmarketing.exception.DotRuntimeException;
 import com.dotmarketing.factories.ClickstreamFactory;
 import com.dotmarketing.factories.EmailFactory;
@@ -41,10 +38,8 @@ import com.dotmarketing.portlets.user.model.UserComment;
 import com.dotmarketing.portlets.webforms.model.WebForm;
 import com.dotmarketing.util.Config;
 import com.dotmarketing.util.InodeUtils;
-import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
 import com.dotmarketing.util.WebKeys;
-import com.liferay.portal.model.Address;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.User;
 import com.liferay.util.servlet.UploadServletRequest;
@@ -359,23 +354,6 @@ public final class SubmitWebFormAction extends DispatchAction {
 				}
 			}*/
 
-			// ### CREATE ADDRESS ###
-			try {
-				List<Address> addresses = PublicAddressFactory.getAddressesByUserId(user.getUserId());
-				Address address = (addresses.size() > 0 ? addresses.get(0) : PublicAddressFactory.getInstance());
-				address.setStreet1(form.getAddress1() == null ? "" : form.getAddress1());
-				address.setStreet2(form.getAddress2() == null ? "" : form.getAddress2());
-				address.setCity(form.getCity() == null ? "" : form.getCity());
-				address.setState(form.getState() == null ? "" : form.getState());
-				address.setZip(form.getZip() == null ? "" : form.getZip());
-				String phone = form.getPhone();
-				address.setPhone(phone == null ? "" : phone);
-				address.setUserId(user.getUserId());
-				address.setCompanyId(company.getCompanyId());
-				PublicAddressFactory.save(address);
-			} catch (Exception ex) {
-				Logger.error(this,ex.getMessage(),ex);
-			}
 
 			Role defaultRole = com.dotmarketing.business.APILocator.getRoleAPI().loadRoleByKey(Config.getStringProperty("CMS_VIEWER_ROLE"));
 			String roleId = defaultRole.getId();

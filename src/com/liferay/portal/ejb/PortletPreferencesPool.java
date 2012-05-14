@@ -161,4 +161,9 @@ public class PortletPreferencesPool implements Cachable {
 	
 	private static PortletPreferencesPool _instance;
 	private boolean _cacheable;
+
+	@Override
+	public void clearCache() {
+		_cache.flushGroup(primaryGroup);
+	}
 }

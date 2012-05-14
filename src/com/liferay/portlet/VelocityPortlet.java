@@ -44,7 +44,6 @@ import org.apache.velocity.util.SimplePool;
 
 import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.VelocityUtil;
-import com.dotmarketing.velocity.VelocityServlet;
 
 /**
  * <a href="VelocityPortlet.java.html"><b><i>View Source</i></b></a>
@@ -196,7 +195,7 @@ public class VelocityPortlet extends GenericPortlet {
 	protected void mergeTemplate(Template template, RenderRequest req, RenderResponse res) throws Exception {
 		RenderRequestImpl reqimp = (RenderRequestImpl) req;
 		RenderResponseImpl resimp = (RenderResponseImpl) res;
-		Context context = VelocityServlet.createContext(reqimp.getHttpServletRequest(), resimp.getHttpServletResponse());
+		Context context = VelocityUtil.getWebContext(reqimp.getHttpServletRequest(), resimp.getHttpServletResponse());
 		
 		res.setContentType(req.getResponseContentType());
 

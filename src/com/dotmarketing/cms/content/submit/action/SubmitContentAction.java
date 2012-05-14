@@ -45,7 +45,6 @@ import com.dotmarketing.util.URLEncoder;
 import com.dotmarketing.util.UtilMethods;
 import com.liferay.portal.PortalException;
 import com.liferay.portal.SystemException;
-import com.liferay.portal.ejb.UserLocalManagerUtil;
 import com.liferay.portal.model.User;
 import com.liferay.util.servlet.UploadServletRequest;
 
@@ -532,7 +531,7 @@ public class SubmitContentAction extends DispatchAction{
 		String userId = request.getParameter("userId");
 		User user = null;
 		if (userId != null && !userId.equals("")) {
-			user = UserLocalManagerUtil.getUserById(userId);
+			user = APILocator.getUserAPI().loadUserById(userId, APILocator.getUserAPI().getSystemUser(), true);
 		} else {
 			user = APILocator.getUserAPI().getAnonymousUser();
 			userId = APILocator.getUserAPI().getAnonymousUser().getUserId();

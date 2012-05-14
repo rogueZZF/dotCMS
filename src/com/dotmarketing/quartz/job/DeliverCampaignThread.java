@@ -18,10 +18,8 @@ import com.dotmarketing.beans.Identifier;
 import com.dotmarketing.beans.Inode;
 import com.dotmarketing.beans.UserProxy;
 import com.dotmarketing.business.APILocator;
-import com.dotmarketing.business.IdentifierCache;
 import com.dotmarketing.business.PermissionAPI;
 import com.dotmarketing.business.RelationshipAPI;
-import com.dotmarketing.cms.factories.PublicAddressFactory;
 import com.dotmarketing.cms.factories.PublicCompanyFactory;
 import com.dotmarketing.cms.factories.PublicEncryptionFactory;
 import com.dotmarketing.db.DbConnectionFactory;
@@ -629,16 +627,6 @@ public class DeliverCampaignThread implements Runnable, StatefulJob {
 	public static String replaceTextVar(String text, Recipient recipient, User subscriber, Communication comm) {
 		String finalMessageStr = text;
 
-		Address address = new Address();
-		try {
-			List<Address> adds = PublicAddressFactory.getAddressesByUserId(subscriber.getUserId());
-			if (adds != null && adds.size() > 0) {
-				address = (Address) adds.get(0);
-			}
-		}
-		catch(Exception e) {
-			Logger.error(DeliverCampaignThread.class, "deliverCampaigns Failed" + e.getMessage());
-		}
 
 		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/rId(>|(&gt;))", "");
 		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))rId(\")?( )*/*( )*(>|(&gt;))", recipient.getInode() + "");
@@ -662,29 +650,6 @@ public class DeliverCampaignThread implements Runnable, StatefulJob {
 			Logger.error(DeliverCampaignThread.class, e.getMessage(), e);
 			throw new DotRuntimeException(e.getMessage(), e);
 		}
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varLastMessage(>|(&gt;))", "");
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varLastMessage(\")?( )*/*( )*(>|(&gt;))", (userproxy.getLastMessage()!=null) ? userproxy.getLastMessage() : "");
-
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varAddress1(>|(&gt;))", "");
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varAddress1(\")?( )*/*( )*(>|(&gt;))", (address.getStreet1()!=null) ? address.getStreet1() : "");
-
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varAddress2(>|(&gt;))", "");
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varAddress2(\")?( )*/*( )*(>|(&gt;))", (address.getStreet2()!=null) ? address.getStreet2() : "");
-
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varPhone(>|(&gt;))", "");
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varPhone(\")?( )*/*( )*(>|(&gt;))", (address.getPhone()!=null) ? address.getPhone() : "");
-
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varState(>|(&gt;))", "");
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varState(\")?( )*/*( )*(>|(&gt;))", (address.getState()!=null) ? address.getState() : "");
-
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varCity(>|(&gt;))", "");
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varCity(\")?( )*/*( )*(>|(&gt;))", (address.getCity()!=null) ? address.getCity() : "");
-
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varCountry(>|(&gt;))", "");
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varCountry(\")?( )*/*( )*(>|(&gt;))", (address.getCountry()!=null) ? address.getCountry() : "");
-
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varZip(>|(&gt;))", "");
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varZip(\")?( )*/*( )*(>|(&gt;))", (address.getZip()!=null) ? address.getZip() : "");
 
 		//gets default company to get locale
 		Company comp = PublicCompanyFactory.getDefaultCompany();

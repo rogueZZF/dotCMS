@@ -9,7 +9,6 @@ import com.dotmarketing.exception.DotRuntimeException;
 import com.dotmarketing.exception.DotSecurityException;
 import com.dotmarketing.util.Config;
 import com.dotmarketing.util.UtilMethods;
-import com.liferay.portal.ejb.UserManagerUtil;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.User;
 
@@ -224,5 +223,10 @@ public class UserAPIImpl implements UserAPI {
 		return roleAPI.doesUserHaveRole(user, roleAPI.loadCMSAdminRole());
 	}
 
+	@Override
+	public int countUsers() throws DotDataException {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

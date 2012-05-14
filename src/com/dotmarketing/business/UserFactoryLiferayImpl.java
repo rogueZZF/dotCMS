@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.dotmarketing.cms.factories.PublicAddressFactory;
 import com.dotmarketing.cms.factories.PublicCompanyFactory;
 import com.dotmarketing.common.db.DotConnect;
 import com.dotmarketing.exception.DotDataException;
@@ -21,10 +20,7 @@ import com.liferay.portal.DuplicateUserEmailAddressException;
 import com.liferay.portal.DuplicateUserIdException;
 import com.liferay.portal.PortalException;
 import com.liferay.portal.SystemException;
-import com.liferay.portal.ejb.AddressLocalManagerUtil;
 import com.liferay.portal.ejb.CompanyLocalManagerUtil;
-import com.liferay.portal.ejb.UserLocalManagerUtil;
-import com.liferay.portal.model.Address;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.User;
 
@@ -40,21 +36,6 @@ public class UserFactoryLiferayImpl extends UserFactory {
 		uc = CacheLocator.getUserCache();
 	}
 	
-	@Override
-	protected User loadDefaultUser() throws DotDataException, NoSuchUserException {
-		Company company = com.dotmarketing.cms.factories.PublicCompanyFactory.getDefaultCompany();
-		try {
-			return loadUserById(User.getDefaultUserId(company.getCompanyId()));
-		} catch (NoSuchUserException e) {
-			Logger.debug(this, "Default user not found attempting to create by updating company");
-			try {
-				CompanyLocalManagerUtil.createDefaultUser(company);
-			} catch (Exception e1) {
-				throw new DotDataException("Unable to create deafult user from company", e1);
-			}
-		}
-		return loadUserById(User.getDefaultUserId(company.getCompanyId()));
-	}
 	
 	@Override
 	public User createUser(String userId, String email) throws DotDataException, DuplicateUserException {
@@ -70,7 +51,7 @@ public class UserFactoryLiferayImpl extends UserFactory {
 					userId = companyId + "." +
 					Long.toString(CounterManagerUtil.increment(User.class.getName() + "." + companyId));
 					try {
-						User user = UserLocalManagerUtil.getUserById(companyId, userId);
+						User user = APILocator.getUserAPI().loadUserById(userId,APILocator.getUserAPI().getSystemUser(),true);
 						if(!user.isNew())
 							more=true;
 						else
@@ -87,7 +68,7 @@ public class UserFactoryLiferayImpl extends UserFactory {
 		}
 		
 		try {
-			defaultUser = APILocator.getUserAPI().getDefaultUser();
+			defaultUser = APILocator.getUserAPI().getSystemUser();
 		} catch (Exception e) {
 			throw new DotDataException("Can't get default user");
 		}		
@@ -131,10 +112,9 @@ public class UserFactoryLiferayImpl extends UserFactory {
 		User u = uc.get(userId);
 		if(!UtilMethods.isSet(u)){
 			try{
-				u = UserLocalManagerUtil.getUserById(userId);
-			}catch (com.liferay.portal.NoSuchUserException e) {
-				throw new NoSuchUserException(e.getMessage(), e);
+				u = APILocator.getUserAPI().loadUserById(userId,APILocator.getUserAPI().getSystemUser(),true);
 			}catch (Exception e) {
+				Logger.error(this, e.getMessage(), e);
 				throw new DotDataException(e.getMessage(), e);
 			}
 			uc.add(userId, u);
@@ -144,13 +124,11 @@ public class UserFactoryLiferayImpl extends UserFactory {
 
 	@Override
 	public User loadByUserByEmail(String email) throws DotDataException, DotSecurityException, NoSuchUserException {
-		String companyId = com.dotmarketing.cms.factories.PublicCompanyFactory.getDefaultCompany().getCompanyId();
 		User u;
 		try {
-			u = UserLocalManagerUtil.getUserByEmailAddress(companyId, email);
-		}catch (com.liferay.portal.NoSuchUserException e) {
-			throw new NoSuchUserException(e.getMessage(), e);
+			u = APILocator.getUserAPI().loadByUserByEmail(email,APILocator.getUserAPI().getSystemUser(),true);
 		} catch (Exception e) {
+			Logger.error(this, "Unable to load user by email : " + e.getMessage(),e);
 			throw new DotDataException(e.getMessage(), e);
 		}
 		return u;
@@ -224,22 +202,12 @@ public class UserFactoryLiferayImpl extends UserFactory {
 	}
 	
 	@Override
-	public User saveUser(User user) throws DotDataException,DuplicateUserException {
+	public User saveUser(User user) throws DotDataException {
 		if (user.getUserId() == null) {
 			throw new DotRuntimeException("Can't save a user without a userId");
 		}
 		
 		try {
-			User oldUser = UserLocalManagerUtil.getUserById(user.getUserId());
-			if(!oldUser.getEmailAddress().equals(user.getEmailAddress())){
-				User emailUser = null;
-				try{ 
-					emailUser = UserLocalManagerUtil.getUserByEmailAddress(user.getCompanyId(), user.getEmailAddress());
-				}catch(Exception e){}
-				if(emailUser!=null){
-					throw new com.dotmarketing.business.DuplicateUserException("User already exists with this email");
-				}
-			}
 			user.setModified(true);
 			String emailAddress = user.getEmailAddress();
 			if(UtilMethods.isSet(emailAddress))
@@ -249,10 +217,7 @@ public class UserFactoryLiferayImpl extends UserFactory {
 			User u =  UserLocalManagerUtil.updateUser(user);
 //			uc.add(u.getUserId(), u);
 			return u;
-		} catch (PortalException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException("saving a user failed", e);
-		} catch (SystemException e) {
+		} catch (Exception e) {
 			Logger.error(this, e.getMessage(), e);
 			throw new DotDataException("saving a user failed", e);
 		}
@@ -260,11 +225,11 @@ public class UserFactoryLiferayImpl extends UserFactory {
 	
 	@Override
 	public boolean userExistsWithEmail(String email) throws DotDataException {
-		String companyId = com.dotmarketing.cms.factories.PublicCompanyFactory.getDefaultCompany().getCompanyId();
 		User u;
 		try {
-			u = UserLocalManagerUtil.getUserByEmailAddress(companyId, email);
+			u = APILocator.getUserAPI().loadByUserByEmail(email,APILocator.getUserAPI().getSystemUser(),true);
 		} catch (Exception e) {
+			Logger.error(this, e.getMessage(), e);
 			throw new DotDataException(e.getMessage(), e);
 		}
 		if(UtilMethods.isSet(u)){
@@ -368,58 +333,10 @@ public class UserFactoryLiferayImpl extends UserFactory {
 	public void delete(User userToDelete) throws DotDataException {
 		uc.remove(userToDelete.getUserId());
 		try {
-			UserLocalManagerUtil.deleteUser(userToDelete.getUserId());
+			APILocator.getUserAPI().delete(userToDelete,APILocator.getUserAPI().getSystemUser(), true);
 		} catch (Exception e) {
 			throw new DotDataException(e.getMessage(), e);
 		}
 	}
 
-	@Override
-	protected void saveAddress(User user, Address ad)
-			throws DotDataException {
-		try 
-		{
-			if(UtilMethods.isSet(ad.getAddressId())) {
-				AddressLocalManagerUtil.updateAddress(ad.getAddressId(), ad.getDescription(), ad.getStreet1(), ad.getStreet2(), ad.getCity(), ad.getState(), 
-						ad.getZip(), ad.getCountry(), ad.getPhone(), ad.getFax(), ad.getCell());
-			} else {
-				Address newAddress = AddressLocalManagerUtil.addAddress(user.getUserId(), user.getClass().getName(), user.getUserId(), ad.getDescription(), ad.getStreet1(), 
-						ad.getStreet2(), ad.getCity(), ad.getState(), ad.getZip(), ad.getCountry(), ad.getPhone(), ad.getFax(), ad.getCell());
-				ad.setAddressId(newAddress.getAddressId());
-			}
-			ad.setNew(false);
-			
-		} catch (PortalException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (SystemException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		}
-	}
-
-	@Override
-	protected Address loadAddressById(String addressId) throws DotDataException {
-		try {
-			return PublicAddressFactory.getAddressById(addressId);
-		} catch (SystemException e) {
-			throw new DotDataException(e.getMessage(), e);
-		}
-	}
-
-	@Override
-	protected void deleteAddress(Address ad) {
-		PublicAddressFactory.delete(ad);
-	}
-
-	@Override
-	protected List<Address> loadUserAddresses(User user)
-			throws DotDataException {
-		try {
-			return PublicAddressFactory.getAddressesByUserId(user.getUserId());
-		} catch (SystemException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		}
-	}
 }

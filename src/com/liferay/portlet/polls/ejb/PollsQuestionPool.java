@@ -156,4 +156,9 @@ public class PollsQuestionPool implements Cachable{
     
 	private static PollsQuestionPool _instance;
 	private boolean _cacheable;
+	
+	@Override
+	public void clearCache() {
+		_cache.flushGroup(primaryGroup);
+	}
 }

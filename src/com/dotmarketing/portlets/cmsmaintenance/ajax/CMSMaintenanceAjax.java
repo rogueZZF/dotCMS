@@ -71,7 +71,6 @@ import com.liferay.portal.PortalException;
 import com.liferay.portal.SystemException;
 import com.liferay.portal.ejb.ImageLocalManagerUtil;
 import com.liferay.portal.ejb.PortletPreferencesLocalManagerUtil;
-import com.liferay.portal.ejb.UserLocalManagerUtil;
 import com.liferay.portal.language.LanguageException;
 import com.liferay.portal.language.LanguageUtil;
 import com.liferay.portal.model.Company;
@@ -183,7 +182,7 @@ public class CMSMaintenanceAjax {
 		String conthasreqrel = "";
 		String conthasnoperm = "";
 
-		User user = UserLocalManagerUtil.getUserById(userId);
+		User user = APILocator.getUserAPI().loadUserById(userId, APILocator.getUserAPI().getSystemUser(), true);
 		for (int i = 0; i < inodes.length; i++) {
 			inodes[i] = inodes[i].trim();
 		}

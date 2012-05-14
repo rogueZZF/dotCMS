@@ -22,6 +22,8 @@
 
 package com.liferay.portal.ejb;
 
+import com.dotmarketing.business.APILocator;
+
 
 /**
  * <a href="CompanyLocalManagerUtil.java.html"><b><i>View Source</i></b></a>
@@ -123,11 +125,7 @@ public class CompanyLocalManagerUtil {
 		throws com.liferay.portal.SystemException {
 		try {
 			CompanyLocalManager companyLocalManager = CompanyLocalManagerFactory.getManager();
-
-			return companyLocalManager.getUsers(companyId);
-		}
-		catch (com.liferay.portal.SystemException se) {
-			throw se;
+			return APILocator.getUserAPI().findAllUsers();
 		}
 		catch (Exception e) {
 			throw new com.liferay.portal.SystemException(e);
@@ -137,12 +135,7 @@ public class CompanyLocalManagerUtil {
 	public static java.util.List getUsers(java.lang.String companyId,
 		int begin, int end) throws com.liferay.portal.SystemException {
 		try {
-			CompanyLocalManager companyLocalManager = CompanyLocalManagerFactory.getManager();
-
-			return companyLocalManager.getUsers(companyId, begin, end);
-		}
-		catch (com.liferay.portal.SystemException se) {
-			throw se;
+			return APILocator.getUserAPI().findAllUsers(begin, end);
 		}
 		catch (Exception e) {
 			throw new com.liferay.portal.SystemException(e);

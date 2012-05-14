@@ -18,7 +18,6 @@ import com.dotmarketing.beans.ChallengeQuestion;
 import com.dotmarketing.beans.UserProxy;
 import com.dotmarketing.business.APILocator;
 import com.dotmarketing.business.Role;
-import com.dotmarketing.cms.factories.PublicAddressFactory;
 import com.dotmarketing.cms.login.factories.LoginFactory;
 import com.dotmarketing.exception.DotDataException;
 import com.dotmarketing.exception.DotRuntimeException;
@@ -29,10 +28,7 @@ import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
 import com.dotmarketing.util.WebKeys;
 import com.liferay.portal.NoSuchUserException;
-import com.liferay.portal.PortalException;
-import com.liferay.portal.SystemException;
 import com.liferay.portal.model.User;
-import com.liferay.portal.util.PortalUtil;
 
 public class CMSUsersWebAPI implements ViewTool {
 
@@ -72,22 +68,6 @@ public class CMSUsersWebAPI implements ViewTool {
 			Logger.error(CMSUsersWebAPI.class,e.getMessage(), e);
 			return new User();
 		}
-	}
-
-	/**
-	 * getAddresesByUser
-	 * 
-	 * @param user User
-	 * @return List
-	 */
-	public List getAddresesByUser(User user) {
-		try {
-			return PublicAddressFactory.getAddressesByUserId(user.getUserId());
-		} catch (Exception e) {
-
-			Logger.error(this,e.getMessage(),e);
-		}
-		return new ArrayList();
 	}
 
 	/**
@@ -196,18 +176,9 @@ public class CMSUsersWebAPI implements ViewTool {
 	 */
 	public User getLoggedInUser(HttpServletRequest request) {
 		User loggedInUser = null;
-		try {
-			loggedInUser = PortalUtil.getUser(request);//back-end user
-		} catch (PortalException e) {
-			Logger.error(CMSUsersWebAPI.class,e.getMessage(), e);
-		} catch (SystemException e) {
-			Logger.error(CMSUsersWebAPI.class,e.getMessage(), e);
-		}
-		if(!UtilMethods.isSet(loggedInUser)){
-			HttpSession session = request.getSession(false);
-			if (session != null) {
-				loggedInUser = (User) session.getAttribute(WebKeys.CMS_USER);
-			}
+		HttpSession session = request.getSession(false);
+		if (session != null) {
+			loggedInUser = (User) session.getAttribute(WebKeys.CMS_USER);
 		}
 		return loggedInUser;
 	}

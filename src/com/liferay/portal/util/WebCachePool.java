@@ -67,5 +67,10 @@ public class WebCachePool implements Cachable{
     public String[] getGroups() {
     	return groupNames;
     }
+
+	@Override
+	public void clearCache() {
+		
+	}
 	
 }

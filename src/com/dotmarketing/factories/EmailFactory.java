@@ -29,7 +29,6 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import com.dotmarketing.beans.Host;
 import com.dotmarketing.beans.UserProxy;
 import com.dotmarketing.business.APILocator;
-import com.dotmarketing.cms.factories.PublicAddressFactory;
 import com.dotmarketing.cms.factories.PublicCompanyFactory;
 import com.dotmarketing.cms.factories.PublicEncryptionFactory;
 import com.dotmarketing.db.HibernateUtil;
@@ -58,7 +57,6 @@ import com.liferay.portal.PortalException;
 import com.liferay.portal.SystemException;
 import com.liferay.portal.language.LanguageException;
 import com.liferay.portal.language.LanguageUtil;
-import com.liferay.portal.model.Address;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.User;
 
@@ -854,17 +852,7 @@ public class EmailFactory {
 
 		if(UtilMethods.isSet(user))
 		{
-			Address address = new Address();
-			try {
-				List<Address> adds = PublicAddressFactory.getAddressesByUserId(user.getUserId());
-				if (adds != null && adds.size() > 0) {
-					address = (Address) adds.get(0);
-				}
-			}
-			catch(Exception e) {
-					Logger.error(EmailFactory.class, "Send To Friend Failed" + e);
-			}
-
+			
 			//Variables replacement from user object
 			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varName(>|(&gt;))", "");
 			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varName(\")?( )*/*( )*(>|(&gt;))", (user.getFirstName()!=null) ? user.getFirstName() : "");
@@ -887,27 +875,6 @@ public class EmailFactory {
 			}	
 			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varLastMessage(>|(&gt;))", "");
 			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varLastMessage(\")?( )*/*( )*(>|(&gt;))", (userproxy.getLastMessage()!=null) ? userproxy.getLastMessage() : "");
-
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varAddress1(>|(&gt;))", "");
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varAddress1(\")?( )*/*( )*(>|(&gt;))", (address.getStreet1()!=null) ? address.getStreet1() : "");
-
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varAddress2(>|(&gt;))", "");
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varAddress2(\")?( )*/*( )*(>|(&gt;))", (address.getStreet2()!=null) ? address.getStreet2() : "");
-
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varPhone(>|(&gt;))", "");
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varPhone(\")?( )*/*( )*(>|(&gt;))", (address.getPhone()!=null) ? address.getPhone() : "");
-
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varState(>|(&gt;))", "");
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varState(\")?( )*/*( )*(>|(&gt;))", (address.getState()!=null) ? address.getState() : "");
-
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varCity(>|(&gt;))", "");
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varCity(\")?( )*/*( )*(>|(&gt;))", (address.getCity()!=null) ? address.getCity() : "");
-
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varCountry(>|(&gt;))", "");
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varCountry(\")?( )*/*( )*(>|(&gt;))", (address.getCountry()!=null) ? address.getCountry() : "");
-
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varZip(>|(&gt;))", "");
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varZip(\")?( )*/*( )*(>|(&gt;))", (address.getZip()!=null) ? address.getZip() : "");
 
 			//gets default company to get locale
 			Company comp = PublicCompanyFactory.getDefaultCompany();

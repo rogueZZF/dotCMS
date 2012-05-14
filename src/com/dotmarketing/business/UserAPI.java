@@ -8,6 +8,7 @@ import com.dotmarketing.exception.DotRuntimeException;
 import com.dotmarketing.exception.DotSecurityException;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.User;
+import com.liferay.util.KeyValuePair;
 
 /**
  * UserAPI is an API intended to be a helper class for class to get User entities.  Classes within the dotCMS
@@ -172,22 +173,6 @@ public interface UserAPI {
      */
     public void delete(User userToDelete, User user, boolean respectFrontEndRoles) throws DotDataException, DotSecurityException;
 
-    /**
-     * Method that saves a new address and tie it to the user
-     * @param user
-     * @param ad
-     * @throws DotDataException 
-     * @throws DotSecurityException 
-     * @throws DotRuntimeException 
-     */
-	public void saveAddress(User userToSaveNewAddress, Address ad, User user, boolean respectFrontEndRoles) throws DotDataException, DotRuntimeException, DotSecurityException;
-
-	/**
-	 * Load address by id 
-	 * @throws DotSecurityException 
-	 */
-	public Address loadAddressById(String addressId, User user, boolean respectFrontEndRoles) throws DotDataException, DotSecurityException;
-
 	/**
 	 * Removes from the system the given address
 	 * @param ad
@@ -198,14 +183,12 @@ public interface UserAPI {
 	public void deleteAddress(Address ad, User user, boolean respectFrontEndRoles) throws DotDataException, DotRuntimeException, DotSecurityException;
 
 	/**
-	 * Retrieves all addresses associated to a user
-	 * @param user
+	 * Can be used for either email or userid login.  Returns an in from the constant on Authenticator
+	 * @param login - Can be email or userid
+	 * @param password
 	 * @return
-	 * @throws DotDataException
-	 * @throws DotSecurityException 
-	 * @throws DotRuntimeException 
 	 */
-	public List<Address> loadUserAddresses(User userToGetAddresses, User user, boolean respectFrontEndRoles) throws DotDataException, DotRuntimeException, DotSecurityException;
+	public int authenticate(String login, String password);
 	
 	/**
 	 * Returns true if the user is a cms admin
@@ -217,5 +200,17 @@ public interface UserAPI {
 	 * @throws DotSecurityException
 	 */
 	public boolean isCMSAdmin(User user) throws DotDataException;
+
+	/**
+	 * Primarily used for autologin
+	 * @param userId
+	 * @param password
+	 * @return
+	 */
+	public KeyValuePair decryptUserId(String userId,String password);
+	
+	public int countUsers() throws DotDataException;
+	
+	public void resetPassword(String userId,String password1, String password2) throws DotDataException, DotSecurityException, NoSuchUserException;
 	
 }
