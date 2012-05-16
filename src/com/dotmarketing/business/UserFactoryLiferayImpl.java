@@ -92,11 +92,6 @@ public class UserFactoryLiferayImpl extends UserFactory {
 		}
 		user.setLanguageId(defaultUser.getLocale().toString());
 		user.setTimeZoneId(defaultUser.getTimeZoneId());
-		user.setSkinId(defaultUser.getSkinId());
-		user.setDottedSkins(defaultUser.isDottedSkins());
-		user.setRoundedSkins(defaultUser.isRoundedSkins());
-		user.setResolution(defaultUser.getResolution());
-		user.setRefreshRate(defaultUser.getRefreshRate());
 		user.setLayoutIds("");
 		user.setNew(false);
 		user.setCompanyId(companyId);

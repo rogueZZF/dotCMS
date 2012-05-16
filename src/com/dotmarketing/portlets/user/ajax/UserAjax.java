@@ -41,7 +41,6 @@ import com.liferay.portal.NoSuchRoleException;
 import com.liferay.portal.PortalException;
 import com.liferay.portal.SystemException;
 import com.liferay.portal.language.LanguageUtil;
-import com.liferay.portal.model.Address;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.Encryptor;
@@ -116,7 +115,7 @@ public class UserAjax {
 		User loggedInUser = uWebAPI.getLoggedInUser(request);
 
 		try {
-			userToSave = (User)uAPI.loadUserById(userId,uAPI.getSystemUser(),false).clone();
+			userToSave = (User)uAPI.loadUserById(userId,uAPI.getSystemUser(),false);
 			userToSave.setModified(false);
 		} catch (Exception e) {
 			Logger.error(this, e.getMessage(), e);
@@ -234,194 +233,6 @@ public class UserAjax {
 		}
 
 
-	}
-
-	public List<Map<String, String>> loadUserAddresses(String userId) throws DotDataException {
-
-		UserAPI uAPI = APILocator.getUserAPI();
-		UserWebAPI uWebAPI = WebAPILocator.getUserWebAPI();
-		WebContext ctx = WebContextFactory.get();
-		HttpServletRequest request = ctx.getHttpServletRequest();
-
-		User user = null;
-		List<Address> userAddresses = new ArrayList<Address>();
-		try {
-			if(UtilMethods.isSet(userId)){
-				user = uAPI.loadUserById(userId, uWebAPI.getLoggedInUser(request), !uWebAPI.isLoggedToBackend(request));
-				userAddresses = uAPI.loadUserAddresses(user, uWebAPI.getLoggedInUser(request), !uWebAPI.isLoggedToBackend(request));
-			}
-		} catch (NoSuchUserException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (DotRuntimeException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (PortalException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (SystemException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (DotSecurityException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		}
-
-		List<Map<String, String>> addressesToReturn = new ArrayList<Map<String,String>>();
-		for(Address add : userAddresses) {
-			addressesToReturn.add(add.toMap());
-		}
-		return addressesToReturn;
-	}
-
-	public Map<String, String> addNewUserAddress(String userId, String addressDescription, String street1, String street2, String city, String state,
-			String zip, String country, String phone, String fax, String cell) throws DotDataException {
-
-		UserAPI uAPI = APILocator.getUserAPI();
-		UserWebAPI uWebAPI = WebAPILocator.getUserWebAPI();
-		WebContext ctx = WebContextFactory.get();
-		HttpServletRequest request = ctx.getHttpServletRequest();
-
-		User user = null;
-		try {
-			user = uAPI.loadUserById(userId, uWebAPI.getLoggedInUser(request), !uWebAPI.isLoggedToBackend(request));
-		} catch (NoSuchUserException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (DotRuntimeException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (PortalException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (SystemException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (DotSecurityException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		}
-
-		Address ad = new Address();
-		ad.setDescription(addressDescription);
-		ad.setStreet1(street1);
-		ad.setStreet2(street2);
-		ad.setCity(city);
-		ad.setState(state);
-		ad.setZip(zip);
-		ad.setCountry(country);
-		ad.setPhone(phone);
-		ad.setFax(fax);
-		ad.setCell(cell);
-
-		try {
-			uAPI.saveAddress(user, ad, uWebAPI.getLoggedInUser(request), !uWebAPI.isLoggedToBackend(request));
-		} catch (DotDataException e) {
-			throw new DotDataException(e.getCause().toString(), e);
-		} catch (DotRuntimeException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (PortalException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (SystemException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (DotSecurityException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		}
-
-		return ad.toMap();
-
-	}
-
-	public Map<String, String> saveUserAddress(String userId, String addressId, String addressDescription, String street1, String street2, String city, String state,
-			String zip, String country, String phone, String fax, String cell) throws DotDataException {
-
-		UserAPI uAPI = APILocator.getUserAPI();
-		UserWebAPI uWebAPI = WebAPILocator.getUserWebAPI();
-		WebContext ctx = WebContextFactory.get();
-		HttpServletRequest request = ctx.getHttpServletRequest();
-
-		User user = null;
-		try {
-			user = uAPI.loadUserById(userId, uWebAPI.getLoggedInUser(request), !uWebAPI.isLoggedToBackend(request));
-		} catch (NoSuchUserException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (DotRuntimeException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (PortalException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (SystemException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (DotSecurityException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		}
-
-		Address ad = new Address();
-		ad.setAddressId(addressId);
-		ad.setDescription(addressDescription);
-		ad.setStreet1(street1);
-		ad.setStreet2(street2);
-		ad.setCity(city);
-		ad.setState(state);
-		ad.setZip(zip);
-		ad.setCountry(country);
-		ad.setPhone(phone);
-		ad.setFax(fax);
-		ad.setCell(cell);
-
-		try {
-			uAPI.saveAddress(user, ad, uWebAPI.getLoggedInUser(request), !uWebAPI.isLoggedToBackend(request));
-		} catch (DotRuntimeException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (PortalException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (SystemException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (DotSecurityException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		}
-
-		return ad.toMap();
-
-	}
-
-	public String deleteAddress(String userId, String addressId) throws DotDataException {
-		UserAPI uAPI = APILocator.getUserAPI();
-		UserWebAPI uWebAPI = WebAPILocator.getUserWebAPI();
-		WebContext ctx = WebContextFactory.get();
-		HttpServletRequest request = ctx.getHttpServletRequest();
-
-		Address ad;
-		try {
-			ad = uAPI.loadAddressById(addressId, uWebAPI.getLoggedInUser(request), !uWebAPI.isLoggedToBackend(request));
-			uAPI.deleteAddress(ad, uWebAPI.getLoggedInUser(request), !uWebAPI.isLoggedToBackend(request));
-		} catch (DotRuntimeException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (PortalException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (SystemException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		} catch (DotSecurityException e) {
-			Logger.error(this, e.getMessage(), e);
-			throw new DotDataException(e.getMessage(), e);
-		}
-
-		return addressId;
 	}
 
 	public void saveUserAddittionalInfo(String userId, boolean active, String prefix, String suffix, String title, String company, String website, String[] additionalVars)

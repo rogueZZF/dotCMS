@@ -121,9 +121,6 @@ public class UserAttributes {
 		if (name.equals(USER_BDATE)) {
 			return _user.getBirthday().toString();
 		}
-		else if (name.equals(USER_GENDER)) {
-			return _user.isMale() ? "male" : "female";
-		}
 		else if (name.equals(USER_EMPLOYER)) {
 			return StringPool.BLANK;
 		}

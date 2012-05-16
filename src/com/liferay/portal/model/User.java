@@ -33,12 +33,10 @@ import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
 import com.liferay.portal.ejb.CompanyManagerUtil;
 import com.liferay.portal.util.PropsUtil;
-import com.liferay.portal.util.Recipient;
 import com.liferay.portlet.admin.ejb.AdminConfigManagerUtil;
 import com.liferay.portlet.admin.model.UserConfig;
 import com.liferay.util.LocaleUtil;
 import com.liferay.util.StringPool;
-import com.liferay.util.StringUtil;
 import com.liferay.util.Validator;
 
 /**
@@ -48,7 +46,7 @@ import com.liferay.util.Validator;
  * @version $Revision: 1.34 $
  *
  */
-public class User extends UserModel implements Recipient {
+public class User extends UserModel {
 
 	public static final String DEFAULT = "default";
 
@@ -195,17 +193,6 @@ public class User extends UserModel implements Recipient {
 		return getFullName(firstName,middleName,lastName);
 	}
 
-	public boolean getFemale() {
-		return !getMale();
-	}
-
-	public boolean isFemale() {
-		return !isMale();
-	}
-
-	public void setFemale(boolean female) {
-		super.setMale(!female);
-	}
 
 	public Locale getLocale() {
 		return _locale;
@@ -240,71 +227,18 @@ public class User extends UserModel implements Recipient {
 		}
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setResolution(String resolution) {
-		if (Validator.isNull(resolution)) {
-			resolution = PropsUtil.get(
-				PropsUtil.DEFAULT_USER_LAYOUT_RESOLUTION);
-		}
-
-		super.setResolution(resolution);
+		//do nothing
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setRefreshRate(String refreshRate) {
-		if (Validator.isNull(refreshRate)) {
-			refreshRate = PropsUtil.get(
-				PropsUtil.DEFAULT_USER_LAYOUT_REFRESH_RATE);
-		}
-
-		super.setRefreshRate(refreshRate);
-	}
-
-	public BaseModel getProtected() {
-		if (_user == null) {
-			protect();
-		}
-
-		return _user;
-	}
-
-	public void protect() {
-		_user = (User)this.clone();
-
-		_user.setPassword(null);
-		_user.setCreateDate(null);
-		_user.setLoginDate(null);
-		_user.setLoginIP(null);
-		_user.setLastLoginDate(null);
-		_user.setLastLoginIP(null);
-		_user.setFailedLoginAttempts(0);
-		_user.setAgreedToTermsOfUse(false);
-		_user.setActive(false);
-	}
-
-	public String getRecipientId() {
-		return getUserId();
-	}
-
-	public String getRecipientName() {
-		return StringUtil.replace(
-			getFullName(),
-			new String[] {
-				StringPool.COLON, StringPool.COMMA
-			},
-			new String[] {
-				StringPool.BLANK, StringPool.BLANK
-			});
-	}
-
-	public String getRecipientAddress() {
-		return getEmailAddress();
-	}
-
-	public String getRecipientInternetAddress() {
-		return getRecipientName() + " <" + getEmailAddress() + ">";
-	}
-
-	public boolean isMultipleRecipients() {
-		return false;
+		//do nothing
 	}
 
 	public int compareTo(Object obj) {
@@ -324,7 +258,6 @@ public class User extends UserModel implements Recipient {
 		map.put("createDate", this.getCreateDate());
 		map.put("emailAddress", this.getEmailAddress());
 		map.put("failedLoginAttempts", this.getFailedLoginAttempts());
-		map.put("male", this.getMale());
 		map.put("firstName", this.getFirstName());
 		map.put("fullName", this.getFullName());
 		map.put("languageId", this.getLanguageId());
@@ -332,7 +265,6 @@ public class User extends UserModel implements Recipient {
 		map.put("lastLoginIP", this.getLastLoginIP());
 		map.put("lastName", this.getLastName());
 		map.put("middleName", this.getMiddleName());
-		map.put("female", this.getFemale());
 		map.put("nickname", this.getNickName());
 		map.put("userId", this.getUserId());
 		map.put("timeZoneId", this.getTimeZoneId());
@@ -342,6 +274,5 @@ public class User extends UserModel implements Recipient {
 	private boolean _defaultUser;
 	private Locale _locale;
 	private TimeZone _timeZone;
-	private User _user;
 
 }

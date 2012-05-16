@@ -365,9 +365,6 @@ public class EditUserManagerAction extends DotPortletAction{
 		if (userForm.getNickName() != null)
 			user.setNickName(userForm.getNickName());
 
-		if (userForm.getSex() != null)
-			user.setMale(userForm.getSex().equalsIgnoreCase("M") ? true : false);
-
 		if(UtilMethods.isSet(userForm.getChallengeQuestionId()) && UtilMethods.isInt(userForm.getChallengeQuestionId())){
 			userProxy.setChallengeQuestionId(userForm.getChallengeQuestionId());
 		}

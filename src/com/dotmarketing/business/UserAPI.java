@@ -213,4 +213,10 @@ public interface UserAPI {
 	
 	public void resetPassword(String userId,String password1, String password2) throws DotDataException, DotSecurityException, NoSuchUserException;
 	
+	/**
+	 * Sends an email to the user with new password.  This method will RESET the user's password
+	 * @param user
+	 */
+	public void sendPassword(User user);
+	
 }

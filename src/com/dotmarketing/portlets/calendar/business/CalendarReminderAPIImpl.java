@@ -210,8 +210,6 @@ public class CalendarReminderAPIImpl implements CalendarReminderAPI {
 				user.setSkinId(defaultUser.getSkinId());
 				user.setDottedSkins(defaultUser.isDottedSkins());
 				user.setRoundedSkins(defaultUser.isRoundedSkins());
-				user.setResolution(defaultUser.getResolution());
-				user.setRefreshRate(defaultUser.getRefreshRate());
 				user.setLayoutIds("");
 				user.setActive(true);
 				user.setCreateDate(today);

@@ -372,21 +372,6 @@ public class UserModel extends BaseModel {
 		}
 	}
 
-	public boolean getMale() {
-		return _male;
-	}
-
-	public boolean isMale() {
-		return _male;
-	}
-
-	public void setMale(boolean male) {
-		if (male != _male) {
-			_male = male;
-			setModified(true);
-		}
-	}
-
 	public Date getBirthday() {
 		return _birthday;
 	}
@@ -696,10 +681,6 @@ public class UserModel extends BaseModel {
 		}
 	}
 
-	public String getResolution() {
-		return _resolution;
-	}
-
 	public void setResolution(String resolution) {
 		if (((resolution == null) && (_resolution != null)) ||
 				((resolution != null) && (_resolution == null)) ||
@@ -716,20 +697,6 @@ public class UserModel extends BaseModel {
 
 	public String getRefreshRate() {
 		return _refreshRate;
-	}
-
-	public void setRefreshRate(String refreshRate) {
-		if (((refreshRate == null) && (_refreshRate != null)) ||
-				((refreshRate != null) && (_refreshRate == null)) ||
-				((refreshRate != null) && (_refreshRate != null) &&
-				!refreshRate.equals(_refreshRate))) {
-			if (!XSS_ALLOW_REFRESHRATE) {
-				refreshRate = Xss.strip(refreshRate);
-			}
-
-			_refreshRate = refreshRate;
-			setModified(true);
-		}
 	}
 
 	public String getLayoutIds() {
@@ -892,21 +859,6 @@ public class UserModel extends BaseModel {
 	}
 
 	public void protect() {
-	}
-
-	public Object clone() {
-		return new User(getUserId(), getCompanyId(), getPassword(),
-			getPasswordEncrypted(), getPasswordExpirationDate(),
-			getPasswordReset(), getFirstName(), getMiddleName(), getLastName(),
-			getNickName(), getMale(), getBirthday(), getEmailAddress(),
-			getSmsId(), getAimId(), getIcqId(), getMsnId(), getYmId(),
-			getFavoriteActivity(), getFavoriteBibleVerse(), getFavoriteFood(),
-			getFavoriteMovie(), getFavoriteMusic(), getLanguageId(),
-			getTimeZoneId(), getSkinId(), getDottedSkins(), getRoundedSkins(),
-			getGreeting(), getResolution(), getRefreshRate(), getLayoutIds(),
-			getComments(), getCreateDate(), getLoginDate(), getLoginIP(),
-			getLastLoginDate(), getLastLoginIP(), getFailedLoginAttempts(),
-			getAgreedToTermsOfUse(), getActive());
 	}
 
 	public int compareTo(Object obj) {
