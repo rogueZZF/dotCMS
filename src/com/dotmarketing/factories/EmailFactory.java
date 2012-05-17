@@ -860,9 +860,6 @@ public class EmailFactory {
 			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varEmail(>|(&gt;))", "");
 			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varEmail(\")?( )*/*( )*(>|(&gt;))", (user.getEmailAddress()!=null) ? user.getEmailAddress() : "");
 
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varMiddleName(>|(&gt;))", "");
-			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varMiddleName(\")?( )*/*( )*(>|(&gt;))", (user.getMiddleName()!=null) ? user.getMiddleName() : "");
-
 			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varLastName(>|(&gt;))", "");
 			finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varLastName(\")?( )*/*( )*(>|(&gt;))", (user.getLastName()!=null) ? user.getLastName() : "");
 

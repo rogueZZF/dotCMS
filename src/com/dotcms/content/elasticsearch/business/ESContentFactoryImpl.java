@@ -295,6 +295,7 @@ public class ESContentFactoryImpl extends ContentletFactory {
             throw new DotDataException("Unable to copy contentlet properties",e);
         }
         con.setInode(fatty.getInode());
+        con.setCreationDate(fatty.getiDate());
         con.setStructureInode(fatty.getStructureInode());
         con.setIdentifier(fatty.getIdentifier());
         con.setSortOrder(fatty.getSortOrder());

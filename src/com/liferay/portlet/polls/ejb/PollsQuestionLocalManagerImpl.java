@@ -30,6 +30,7 @@ import com.dotmarketing.business.APILocator;
 import com.dotmarketing.business.NoSuchUserException;
 import com.dotmarketing.exception.DotDataException;
 import com.dotmarketing.exception.DotSecurityException;
+import com.dotmarketing.util.CompanyUtils;
 import com.dotmarketing.util.Logger;
 import com.liferay.counter.ejb.CounterManagerUtil;
 import com.liferay.portal.PortalException;
@@ -91,7 +92,7 @@ public class PollsQuestionLocalManagerImpl
 		}
 
 		question.setPortletId(portletId);
-		question.setCompanyId(user.getCompanyId());
+		question.setCompanyId(CompanyUtils.getDefaultCompany().getCompanyId());
 		question.setUserId(user.getUserId());
 		question.setUserName(user.getFullName());
 		question.setCreateDate(now);

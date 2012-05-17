@@ -558,7 +558,7 @@ public class EditContainerAction extends DotPortletAction implements
 		APILocator.getIdentifierAPI().save(identifier);
 
 		SessionMessages.add(httpReq, "message", "message.containers.save");
-		ActivityLogger.logInfo(this.getClass(), "Save WebAsset action", "User " + user.getPrimaryKey() + " saved " + container.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
+		ActivityLogger.logInfo(this.getClass(), "Save WebAsset action", "User " + user.getUserId() + " saved " + container.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
 		// saves to working folder under velocity
 		ContainerServices.invalidate(container, true);
 

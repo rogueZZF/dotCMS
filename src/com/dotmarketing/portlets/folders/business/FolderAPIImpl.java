@@ -42,6 +42,7 @@ import com.dotmarketing.portlets.htmlpages.model.HTMLPage;
 import com.dotmarketing.portlets.links.model.Link;
 import com.dotmarketing.portlets.structure.factories.StructureFactory;
 import com.dotmarketing.portlets.structure.model.Structure;
+import com.dotmarketing.util.CompanyUtils;
 import com.dotmarketing.util.InodeUtils;
 import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
@@ -693,7 +694,7 @@ public class FolderAPIImpl implements FolderAPI  {
 	public List<String> getEntriesTree(Folder mainFolder, String openNodes,String view, String content, String structureInode,User user)
 			throws DotStateException, DotDataException, DotSecurityException {
 		Locale locale = user.getLocale();
-		TimeZone timeZone = user.getTimeZone();
+		TimeZone timeZone = CompanyUtils.getDefaultCompany().getTimeZone();
 		Role[] roles = (Role[])APILocator.getRoleAPI().loadRolesForUser(user.getUserId()).toArray(new Role[0]);
 		boolean isAdminUser = APILocator.getUserAPI().isCMSAdmin(user);
 		return ffac.getEntriesTree(mainFolder, openNodes, view, content, structureInode, locale, timeZone, roles, isAdminUser, user);
@@ -704,7 +705,7 @@ public class FolderAPIImpl implements FolderAPI  {
 			String content, String structureInode,User user)
 			throws DotStateException, DotDataException, DotSecurityException {
 		Locale locale = user.getLocale();
-		TimeZone timeZone = user.getTimeZone();
+		TimeZone timeZone = CompanyUtils.getDefaultCompany().getTimeZone();
 		Role[] roles = (Role[])APILocator.getRoleAPI().loadRolesForUser(user.getUserId()).toArray(new Role[0]);
 		boolean isAdminUser = APILocator.getUserAPI().isCMSAdmin(user);
 		return ffac.getFolderTree(openNodes, view, content, structureInode, locale, timeZone, roles, isAdminUser, user);

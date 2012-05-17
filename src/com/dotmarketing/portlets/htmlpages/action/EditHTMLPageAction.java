@@ -478,7 +478,7 @@ public class EditHTMLPageAction extends DotPortletAction implements DotPortletAc
 		// setting parent folder path and inode on the form bean
 		HTMLPageForm hf = (HTMLPageForm) form;
 
-		ActivityLogger.logInfo(this.getClass(), "editing HTMLpage action", "User " + user.getPrimaryKey() + " editing page" + hf.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
+		ActivityLogger.logInfo(this.getClass(), "editing HTMLpage action", "User " + user.getUserId() + " editing page" + hf.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
 		
 		hf.setSelectedparent(parentFolder.getName());
 		hf.setParent(parentFolder.getInode());
@@ -666,7 +666,7 @@ public class EditHTMLPageAction extends DotPortletAction implements DotPortletAc
 		String this_page = workingAsset.getURI(parentFolder);
 		req.setAttribute(WebKeys.HTMLPAGE_REFERER, this_page);
 		
-		ActivityLogger.logInfo(this.getClass(), "save HTMLpage action", "User " + user.getPrimaryKey() + " save page " + workingAsset.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
+		ActivityLogger.logInfo(this.getClass(), "save HTMLpage action", "User " + user.getUserId() + " save page " + workingAsset.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
 
 	}
 
@@ -697,7 +697,7 @@ public class EditHTMLPageAction extends DotPortletAction implements DotPortletAc
 
 		HTMLPageFactory.copyHTMLPage(currentHTMLPage, parent);
 
-		ActivityLogger.logInfo(this.getClass(), "copy HTMLpage action", "User " + user.getPrimaryKey() + " copying page" + currentHTMLPage.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
+		ActivityLogger.logInfo(this.getClass(), "copy HTMLpage action", "User " + user.getUserId() + " copying page" + currentHTMLPage.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
 
 		SessionMessages.add(httpReq, "message", "message.htmlpage.copy");
 	}

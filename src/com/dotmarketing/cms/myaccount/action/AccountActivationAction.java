@@ -16,6 +16,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.dotmarketing.beans.Host;
 import com.dotmarketing.business.APILocator;
+import com.dotmarketing.business.NoSuchUserException;
 import com.dotmarketing.business.web.HostWebAPI;
 import com.dotmarketing.business.web.WebAPILocator;
 import com.dotmarketing.cms.factories.PublicCompanyFactory;
@@ -71,49 +72,48 @@ public class AccountActivationAction extends DispatchAction {
 		String linkExpirationDateStr = strTok.nextToken();
 
 		Date linkExpirationDate = UtilMethods.jdbcToDate(linkExpirationDateStr);
-		User user = APILocator.getUserAPI().loadUserById(userId,APILocator.getUserAPI().getSystemUser(),false);
 		ActionMessages am = new ActionMessages();
-
-		if (!user.isNew()) {
-
-			// the user exists
-			if (!user.isActive()) {
+		try{
+			User user = APILocator.getUserAPI().loadUserById(userId,APILocator.getUserAPI().getSystemUser(),false);
 	
-				if (linkExpirationDate.after(new Date())) {
-					user.setActive(true);
-					APILocator.getUserAPI().save(user, APILocator.getUserAPI().getSystemUser(), false);
+				// the user exists
+				if (user.isArchived()) {
 		
-					//Logging in the user
-			        Company comp = com.dotmarketing.cms.factories.PublicCompanyFactory.getDefaultCompany();
-			        if (comp.getAuthType().equals(Company.AUTH_TYPE_EA)) {
-			        	LoginFactory.doLogin(user.getEmailAddress(), user.getPassword(), false, request, response);
-			        } else {
-			        	LoginFactory.doLogin(user.getUserId(), user.getPassword(), false, request, response);
-			        }
-					
-					am.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.account.user.activated"));
+					if (linkExpirationDate.after(new Date())) {
+						APILocator.getUserAPI().enableUser(user);
+			
+						//Logging in the user
+				        Company comp = com.dotmarketing.cms.factories.PublicCompanyFactory.getDefaultCompany();
+				        if (comp.getAuthType().equals(Company.AUTH_TYPE_EA)) {
+				        	LoginFactory.doLogin(user.getEmailAddress(), user.getPassword(), false, request, response);
+				        } else {
+				        	LoginFactory.doLogin(user.getUserId(), user.getPassword(), false, request, response);
+				        }
+						
+						am.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.account.user.activated"));
+						saveMessages(request.getSession(), am);
+						ActionForward forward = mapping.findForward("confirmation");
+						return forward;
+					}
+					else {
+						// resending activation account link
+						request.setAttribute("userId", user.getUserId());
+						return mapping.findForward("resendPage");
+					}
+				}
+				else {
+					am.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.account.user.already.active"));
 					saveMessages(request.getSession(), am);
 					ActionForward forward = mapping.findForward("confirmation");
 					return forward;
 				}
-				else {
-					// resending activation account link
-					request.setAttribute("userId", user.getUserId());
-					return mapping.findForward("resendPage");
-				}
-			}
-			else {
-				am.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("message.account.user.already.active"));
-				saveMessages(request.getSession(), am);
-				ActionForward forward = mapping.findForward("confirmation");
-				return forward;
-			}
+		}catch(NoSuchUserException nsu){
+	
+			// the user does not exists
+			am.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.user.not.exist"));
+			saveMessages(request.getSession(), am);
+			return mapping.findForward("loginPage");
 		}
-
-		// the user does not exists
-		am.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.user.not.exist"));
-		saveMessages(request.getSession(), am);
-		return mapping.findForward("loginPage");
 	}
 
 	/**

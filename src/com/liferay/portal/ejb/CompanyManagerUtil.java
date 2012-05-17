@@ -155,12 +155,6 @@ public class CompanyManagerUtil {
 			//companyManager.updateUsers(languageId, timeZoneId, skinId, dottedSkins, roundedSkins, resolution);
 			
 			User u = APILocator.getUserAPI().getSystemUser();
-			u.setLanguageId(languageId);
-			u.setTimeZoneId(timeZoneId);
-			u.setSkinId(skinId);
-			u.setDottedSkins(dottedSkins);
-			u.setRoundedSkins(roundedSkins);
-			u.setResolution(resolution);
 			
 			APILocator.getUserAPI().save(u, u, true);
 			

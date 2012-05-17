@@ -26,6 +26,7 @@ import com.dotmarketing.portlets.mailinglists.factories.MailingListFactory;
 import com.dotmarketing.portlets.mailinglists.model.MailingList;
 import com.dotmarketing.util.InodeUtils;
 import com.dotmarketing.util.Logger;
+import com.dotmarketing.util.UUIDGenerator;
 import com.dotmarketing.util.UtilMethods;
 import com.liferay.portal.model.User;
 
@@ -160,12 +161,7 @@ public class MailingListsSubscribeAction extends DispatchAction {
 			user.setEmailAddress(form.getEmailAddress());
 			user.setFirstName(form.getName() == null ? "" : form.getName());
 			user.setLastName(form.getLastName() == null ? "" : form.getLastName());
-			user.setPasswordEncrypted(true);
-			user.setPassword(PublicEncryptionFactory.getRandomEncryptedPassword());
-			user.setComments("");
-			user.setGreeting("Welcome, " + user.getFullName() + "!");
-			user.setCreateDate(today);
-			user.setActive(true);
+			user.setPassword(UUIDGenerator.generateUuid());
 			APILocator.getUserAPI().save(user,APILocator.getUserAPI().getSystemUser(),false);
 		}
 

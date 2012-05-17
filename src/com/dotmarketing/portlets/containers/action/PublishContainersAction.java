@@ -89,7 +89,7 @@ public class PublishContainersAction extends DotPortletAction {
 				}
 			}
 			
-			ActivityLogger.logInfo(this.getClass(), "Publishing Container action", "User " + user.getPrimaryKey() + " publishing container" + container.getTitle(), HostUtil.hostNameUtil(req, user));
+			ActivityLogger.logInfo(this.getClass(), "Publishing Container action", "User " + user.getUserId() + " publishing container" + container.getTitle(), HostUtil.hostNameUtil(req, user));
 		}
 
 		

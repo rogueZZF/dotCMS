@@ -637,9 +637,6 @@ public class DeliverCampaignThread implements Runnable, StatefulJob {
 		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varEmail(>|(&gt;))", "");
 		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varEmail(\")?( )*/*( )*(>|(&gt;))", (subscriber.getEmailAddress()!=null) ? subscriber.getEmailAddress() : "");
 
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varMiddleName(>|(&gt;))", "");
-		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varMiddleName(\")?( )*/*( )*(>|(&gt;))", (subscriber.getMiddleName()!=null) ? subscriber.getMiddleName() : "");
-
 		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))/varLastName(>|(&gt;))", "");
 		finalMessageStr = finalMessageStr.replaceAll("(?i)(<|(&lt;))varLastName(\")?( )*/*( )*(>|(&gt;))", (subscriber.getLastName()!=null) ? subscriber.getLastName() : "");
 

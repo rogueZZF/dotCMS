@@ -118,9 +118,6 @@ public class UserAttributes {
 			return null;
 		}
 
-		if (name.equals(USER_BDATE)) {
-			return _user.getBirthday().toString();
-		}
 		else if (name.equals(USER_EMPLOYER)) {
 			return StringPool.BLANK;
 		}
@@ -138,9 +135,6 @@ public class UserAttributes {
 		}
 		else if (name.equals(USER_NAME_FAMILY)) {
 			return _user.getLastName();
-		}
-		else if (name.equals(USER_NAME_MIDDLE)) {
-			return _user.getMiddleName();
 		}
 		else if (name.equals(USER_NAME_SUFFIX)) {
 			return StringPool.BLANK;

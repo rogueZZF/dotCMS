@@ -323,7 +323,7 @@ public class WebAssetFactory {
 	    
 		if (!currWebAsset.isLocked()) {
 			// sets lock true
-		    User proxyuser=new User(userId);
+		    User proxyuser=APILocator.getUserAPI().loadUserById(userId, APILocator.getUserAPI().getSystemUser(), true);
 			APILocator.getVersionableAPI().setLocked(currWebAsset, true, proxyuser);
 			return true;
 		}

@@ -1,6 +1,5 @@
 package com.dotmarketing.auth;
 
-import com.liferay.portal.model.User;
 import com.liferay.util.Validator;
 
 /**
@@ -17,7 +16,7 @@ public class UserIdValidatorImpl extends com.liferay.portal.UserIdValidator{
 //			Validator.isEmailAddress(userId) ||
 			(userId.equalsIgnoreCase("cyrus")) ||
 			(userId.equalsIgnoreCase("postfix")) ||
-			(userId.indexOf(User.DEFAULT) != -1)) 
+			(userId.indexOf("default") != -1)) 
 //			(userId.indexOf(companyId) != -1) ||
 //			(userId.indexOf("_") != -1)) {
 			{

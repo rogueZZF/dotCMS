@@ -66,7 +66,7 @@ public class UserAjax {
 		try {
 			user = uAPI.loadUserById(userId,uWebAPI.getSystemUser(), !uWebAPI.isLoggedToBackend(request));
 
-			Map<String, Object> aRecord = user.toMap();
+			Map<String, Object> aRecord = user.getMap();
 			aRecord.put("id", user.getUserId());
 			aRecord.put("type", USER_TYPE_VALUE);
 			aRecord.put("name", user.getFullName());
@@ -95,7 +95,7 @@ public class UserAjax {
 		User user = uAPI.createUser(userId, email);
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
-		user.setPassword(Encryptor.digest(password));
+		user.setPassword(password);
 		uAPI.save(user, uWebAPI.getLoggedInUser(request), !uWebAPI.isLoggedToBackend(request));
 
 		return user.getUserId();
@@ -116,7 +116,6 @@ public class UserAjax {
 
 		try {
 			userToSave = (User)uAPI.loadUserById(userId,uAPI.getSystemUser(),false);
-			userToSave.setModified(false);
 		} catch (Exception e) {
 			Logger.error(this, e.getMessage(), e);
 			return null;
@@ -125,7 +124,7 @@ public class UserAjax {
 		userToSave.setLastName(lastName);
 		userToSave.setEmailAddress(email);
 		if(password != null) {
-			userToSave.setPassword(Encryptor.digest(password));
+			userToSave.setPassword(password);
 		}
 
 		if(userToSave.getUserId().equalsIgnoreCase(loggedInUser.getUserId())){
@@ -255,7 +254,6 @@ public class UserAjax {
 				throw new DotRuntimeException(LanguageUtil.get(uWebAPI.getLoggedInUser(request),"deactivate-your-own-user-error"));
 			}
 
-			u.setActive(active);
 			up.setPrefix(prefix);
 			up.setSuffix(suffix);
 			up.setTitle(title);
@@ -784,8 +782,6 @@ private Map<String, Object> processRoleList(String query, int start, int limit, 
 		boolean respectFrontend = uWebAPI.isLoggedToBackend(request);
 
 		User toUpdate = userAPI.loadUserById(userId, user, respectFrontend);
-		toUpdate.setTimeZoneId(timeZoneId);
-		toUpdate.setLanguageId(languageId);
 		userAPI.save(toUpdate, user, respectFrontend);
 
 	}

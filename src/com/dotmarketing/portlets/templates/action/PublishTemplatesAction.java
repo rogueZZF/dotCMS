@@ -90,7 +90,7 @@ public class PublishTemplatesAction extends DotPortletAction {
 				//calls the asset factory edit
 				try{
 					PublishFactory.publishAsset(template,reqImpl.getHttpServletRequest());
-					ActivityLogger.logInfo(this.getClass(), "Publish Template action", "User " + user.getPrimaryKey() + " publishing template" + template.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
+					ActivityLogger.logInfo(this.getClass(), "Publish Template action", "User " + user.getUserId() + " publishing template" + template.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
 					SessionMessages.add(req, "message", "message.template_list.published");
 				}catch(WebAssetException wax){
 					Logger.error(this, wax.getMessage(),wax);

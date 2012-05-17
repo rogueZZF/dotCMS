@@ -29,6 +29,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.dotmarketing.cms.factories.PublicEncryptionFactory;
+import com.dotmarketing.portlets.contentlet.model.Contentlet;
 import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
 import com.liferay.portal.ejb.CompanyManagerUtil;
@@ -46,136 +48,67 @@ import com.liferay.util.Validator;
  * @version $Revision: 1.34 $
  *
  */
-public class User extends UserModel {
+public class User extends Contentlet {
 
-	public static final String DEFAULT = "default";
-
-	public static String getDefaultUserId(String companyId) {
-		return companyId + "." + DEFAULT;
-	}
-
-	public static String getFullName(
-		String firstName, String middleName, String lastName) {
-
-		if (Validator.isNull(middleName)) {
-			return firstName + StringPool.SPACE + lastName;
-		}
-		else {
-			return firstName + StringPool.SPACE + middleName +
-				StringPool.SPACE + lastName;
-		}
-	}
-
+	private static final long serialVersionUID = 7685593215495607428L;
+	
+	private static final String EMAIL_KEY = "email";
+	private static final String USERID_KEY = "userId";
+	private static final String FIRSTNAME_KEY = "firstName";
+	private static final String LASTNAME_KEY = "lastName";
+	private static final String PASSWORD_KEY = "password";
+	
 	public User() {
 		super();
 	}
-
-	public User(String userId) {
-		super(userId);
+	
+	public String getUserId(){
+		return super.getStringProperty(USERID_KEY);
 	}
-
-	public User(String userId, String companyId, String password,
-				boolean passwordEncrypted, Date passwordExpirationDate,
-				boolean passwordReset, String firstName, String middleName,
-				String lastName, String nickName, boolean male, Date birthday,
-				String emailAddress, String smsId, String aimId, String icqId,
-				String msnId, String ymId, String favoriteActivity,
-				String favoriteBibleVerse, String favoriteFood,
-				String favoriteMovie, String favoriteMusic, String languageId,
-				String timeZoneId, String skinId, boolean dottedSkins,
-				boolean roundedSkins, String greeting, String resolution,
-				String refreshRate, String layoutIds, String comments,
-				Date createDate, Date loginDate, String loginIP,
-				Date lastLoginDate, String lastLoginIP, int failedLoginAttempts,
-				boolean agreedToTermsOfUse, boolean active) {
-
-		super(userId, companyId, password, passwordEncrypted,
-			  passwordExpirationDate, passwordReset, firstName, middleName,
-			  lastName, nickName, male, birthday, emailAddress, smsId, aimId,
-			  icqId, msnId, ymId, favoriteActivity, favoriteBibleVerse,
-			  favoriteFood, favoriteMovie, favoriteMusic, languageId,
-			  timeZoneId, skinId, dottedSkins, roundedSkins, greeting,
-			  resolution, refreshRate, layoutIds, comments, createDate,
-			  loginDate, loginIP, lastLoginDate, lastLoginIP,
-			  failedLoginAttempts, agreedToTermsOfUse, active);
-
-		setCompanyId(companyId);
-		setLanguageId(languageId);
-		setTimeZoneId(timeZoneId);
-		setResolution(resolution);
-		setRefreshRate(refreshRate);
+	
+	public String getFirstName(){
+		return super.getStringProperty(FIRSTNAME_KEY);
 	}
-
-	public boolean isDefaultUser() {
-		return _defaultUser;
+	
+	public String getLastName(){
+		return super.getStringProperty(LASTNAME_KEY);
 	}
-
-	public void setCompanyId(String companyId) {
-		if (companyId.equalsIgnoreCase(DEFAULT)) {
-			_defaultUser = true;
-		}
-		else {
-			_defaultUser = false;
-		}
-
-		super.setCompanyId(companyId);
+	
+	public String getPassword(){
+		return super.getStringProperty(PASSWORD_KEY);
 	}
-
-	public String getActualCompanyId() {
-		if (isDefaultUser()) {
-			return getUserId().substring(
-				0, getUserId().indexOf(User.DEFAULT) - 1);
-		}
-		else {
-			return getCompanyId();
-		}
+	
+	public Date getCreateDate(){
+		return super.getCreationDate();
 	}
-
-	public String getCompanyMx() {
-		String companyMx = null;
-
-		try {
-			companyMx =
-				CompanyManagerUtil.getCompany(getCompanyId()).getMx();
-		}
-		catch (Exception e) {
-			Logger.error(this,e.getMessage(),e);
-		}
-
-		return companyMx;
+	
+	public void setUserId(String userId){
+		setStringProperty(USERID_KEY, userId);
 	}
-
-	public boolean hasCompanyMx() {
-		return hasCompanyMx(getEmailAddress());
+	
+	public void setFirstName(String firstName){
+		setStringProperty(FIRSTNAME_KEY, firstName);
 	}
-
-	public boolean hasCompanyMx(String emailAddress) {
-		String mx = emailAddress.substring(
-			emailAddress.indexOf('@') + 1, emailAddress.length());
-
-		if (mx.equals(getCompanyMx())) {
-			return true;
-		}
-
-		try {
-			UserConfig userConfig =
-				AdminConfigManagerUtil.getUserConfig(getCompanyId());
-
-			if (userConfig.hasMailHostName(mx)) {
-				return true;
-			}
-		}
-		catch (Exception e) {
-			Logger.error(this,e.getMessage(),e);
-		}
-
-		return false;
+	
+	public void setLastName(String lastName){
+		setStringProperty(LASTNAME_KEY, lastName);
 	}
-
+	
+	public void setPassword(String password){
+		setStringProperty(PASSWORD_KEY, PublicEncryptionFactory.digestString(password));
+	}
+	
+	public void setEmailAddress(String email){
+		setStringProperty(EMAIL_KEY, email);
+	}
+	
+	public String getEmailAddress(){
+		return super.getStringProperty(EMAIL_KEY);
+	}
+	
 	public boolean isPasswordExpired() {
 		if (getPasswordExpirationDate() != null &&
 			getPasswordExpirationDate().before(new Date())) {
-
 			return true;
 		}
 		else {
@@ -184,61 +117,16 @@ public class User extends UserModel {
 	}
 
 	public String getFullName() {
-		String firstName = getFirstName();
+		String firstName = super.getStringProperty("firstName");
 		firstName = (UtilMethods.isSet(firstName) ? firstName : "");
-		String middleName = getMiddleName();
-		middleName = (UtilMethods.isSet(middleName) ? middleName : "");
-		String lastName = getLastName();
+		String lastName = super.getStringProperty("lastName");
 		lastName = (UtilMethods.isSet(lastName) ? lastName : "");
-		return getFullName(firstName,middleName,lastName);
+		return firstName + " " + lastName;
 	}
 
 
 	public Locale getLocale() {
 		return _locale;
-	}
-
-	public void setLanguageId(String languageId) {
-		_locale = LocaleUtil.fromLanguageId(languageId);
-
-		super.setLanguageId(_locale.getLanguage() + "_" + _locale.getCountry());
-	}
-
-	public TimeZone getTimeZone() {
-		return _timeZone;
-	}
-
-	public void setTimeZoneId(String timeZoneId) {
-		if (Validator.isNull(timeZoneId)) {
-			timeZoneId = TimeZone.getDefault().getID();
-		}
-
-		_timeZone = TimeZone.getTimeZone(timeZoneId);
-
-		super.setTimeZoneId(timeZoneId);
-	}
-
-	public boolean hasCustomSkin() {
-		if (getUserId().equals(getSkinId())) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public void setResolution(String resolution) {
-		//do nothing
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public void setRefreshRate(String refreshRate) {
-		//do nothing
 	}
 
 	public int compareTo(Object obj) {
@@ -247,32 +135,8 @@ public class User extends UserModel {
 		return getFullName().toLowerCase().compareTo(
 			user.getFullName().toLowerCase());
 	}
-	
-	public Map<String, Object> toMap() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("active", this.getActive());
-		map.put("actualCompanyId", this.getActualCompanyId());
-		map.put("birthday", this.getBirthday());
-		map.put("comments", this.getComments());
-		map.put("companyId", this.getCompanyId());
-		map.put("createDate", this.getCreateDate());
-		map.put("emailAddress", this.getEmailAddress());
-		map.put("failedLoginAttempts", this.getFailedLoginAttempts());
-		map.put("firstName", this.getFirstName());
-		map.put("fullName", this.getFullName());
-		map.put("languageId", this.getLanguageId());
-		map.put("lastLoginDate", this.getLastLoginDate());
-		map.put("lastLoginIP", this.getLastLoginIP());
-		map.put("lastName", this.getLastName());
-		map.put("middleName", this.getMiddleName());
-		map.put("nickname", this.getNickName());
-		map.put("userId", this.getUserId());
-		map.put("timeZoneId", this.getTimeZoneId());
-		return map;
-	}
 
 	private boolean _defaultUser;
 	private Locale _locale;
-	private TimeZone _timeZone;
 
 }

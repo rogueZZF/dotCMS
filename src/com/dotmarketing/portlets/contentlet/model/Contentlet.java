@@ -54,6 +54,7 @@ public class Contentlet implements Serializable, Permissionable, Categorizable, 
 
     private static final long serialVersionUID = 1L;
     public static final String INODE_KEY = "inode";
+    public static final String IDATE_KEY = "iDate";
     public static final String LANGUAGEID_KEY = "languageId";
     public static final String STRUCTURE_INODE_KEY = "stInode";
     public static final String LAST_REVIEW_KEY = "lastReview";
@@ -153,6 +154,14 @@ public class Contentlet implements Serializable, Permissionable, Categorizable, 
 
     public void setInode(String inode) {
         map.put(INODE_KEY, inode);
+    }
+    
+    public void setCreationDate(Date date) {
+        map.put(IDATE_KEY, date);
+    }
+    
+    public Date getCreationDate(){
+    	return (Date)map.get(IDATE_KEY);
     }
     
     public long getLanguageId() {

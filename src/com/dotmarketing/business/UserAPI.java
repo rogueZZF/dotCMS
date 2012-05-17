@@ -219,4 +219,6 @@ public interface UserAPI {
 	 */
 	public void sendPassword(User user);
 	
+	public void enableUser(User user) throws DotDataException;
+	
 }

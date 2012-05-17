@@ -31,6 +31,7 @@ import com.dotmarketing.exception.DotDataException;
 import com.dotmarketing.exception.DotSecurityException;
 import com.dotmarketing.factories.EmailFactory;
 import com.dotmarketing.util.Config;
+import com.dotmarketing.util.InodeUtils;
 import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
 import com.dotmarketing.util.Validator;
@@ -125,8 +126,10 @@ public class ForgotPasswordAction extends DispatchAction {
 		}
 		
 		//If the user doesn't exists
-		User user = APILocator.getUserAPI().loadByUserByEmail(form.getEmail(), APILocator.getUserAPI().getSystemUser(), false);
-		if(user.isNew()){
+		User user = null;
+		try{
+			user = APILocator.getUserAPI().loadByUserByEmail(form.getEmail(), APILocator.getUserAPI().getSystemUser(), false);
+		}catch(NoSuchUserException nsu){
 			ActionErrors aes = new ActionErrors();
 			aes.add(Globals.ERROR_KEY, new ActionMessage("error.user.email.doesnt.exists"));
 			saveMessages(request.getSession(), aes);
@@ -137,11 +140,10 @@ public class ForgotPasswordAction extends DispatchAction {
 	        	return af;
 			} else 
 				return af;
-			
 		}
 
 		//If the account is not active
-		if(!user.isActive()){
+		if(!user.isArchived()){
 			
 			ActionMessages aes = new ActionErrors();
 			aes.add(Globals.ERROR_KEY, new ActionMessage("error.user.is.not.active"));
@@ -169,7 +171,7 @@ public class ForgotPasswordAction extends DispatchAction {
 			//if we have some errors
 
 			String pass = PublicEncryptionFactory.getRandomPassword();
-			user.setPassword(PublicEncryptionFactory.digestString(pass));
+			user.setPassword(pass);
 			APILocator.getUserAPI().save(user,APILocator.getUserAPI().getSystemUser(),false);
 			Host host = hostWebAPI.getCurrentHost(request);
         	Company company = PublicCompanyFactory.getDefaultCompany(); 
@@ -235,7 +237,7 @@ public class ForgotPasswordAction extends DispatchAction {
         	if (userProxy.getChallengeQuestionAnswer().equalsIgnoreCase(challengeQuestionAnswer)) {
 				
 				String pass = PublicEncryptionFactory.getRandomPassword();
-				user.setPassword(PublicEncryptionFactory.digestString(pass));
+				user.setPassword(pass);
 				APILocator.getUserAPI().save(user,APILocator.getUserAPI().getSystemUser(),false);
 				Host host = hostWebAPI.getCurrentHost(request);
 				try {
@@ -301,23 +303,22 @@ public class ForgotPasswordAction extends DispatchAction {
 
 		ActionMessages am = new ActionMessages();
 
-		User user = APILocator.getUserAPI().loadByUserByEmail(emailAddress, APILocator.getUserAPI().getSystemUser(), false);
-		if (!user.isNew()) {
-
+		User user = null;
+		try{
+			user = APILocator.getUserAPI().loadByUserByEmail(emailAddress, APILocator.getUserAPI().getSystemUser(), false);
 			// the user is active
-			// sending Reset Password Email
-			sendResetPasswordEmail(user, request);
-	
-			am.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("send.reset.password.email.confirmation"));
-			saveMessages(request.getSession(), am);
-			return mapping.findForward("emailSentConfirmationPage");
-
+						// sending Reset Password Email
+						sendResetPasswordEmail(user, request);
+				
+						am.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("send.reset.password.email.confirmation"));
+						saveMessages(request.getSession(), am);
+						return mapping.findForward("emailSentConfirmationPage");
+		}catch (NoSuchUserException e) {
+			// the user does not exists
+			am.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.user.not.exist"));
+			saveMessages(request, am);
+			return mapping.findForward("loginAction");
 		}
-
-		// the user does not exists
-		am.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.user.not.exist"));
-		saveMessages(request, am);
-		return mapping.findForward("loginAction");
 	}
 
 	private void sendResetPasswordEmail(User user, HttpServletRequest request) throws PortalException, SystemException, DotDataException, DotSecurityException {
@@ -374,7 +375,7 @@ public class ForgotPasswordAction extends DispatchAction {
 
 		ActionMessages am = new ActionMessages();
 
-		if (!user.isNew()) {
+		if (user != null && InodeUtils.isSet(user.getInode())) {
 		
 			// the user is active
 			// validating reset password email link
@@ -385,8 +386,7 @@ public class ForgotPasswordAction extends DispatchAction {
 				if (!Validator.validate(request, lf, mapping))
 					return mapping.findForward("resetPasswordPage");
 
-				user.setPassword(PublicEncryptionFactory.digestString(form.getNewPassword()));
-				user.setPasswordEncrypted(true);
+				user.setPassword(form.getNewPassword());
 
 				APILocator.getUserAPI().save(user,APILocator.getUserAPI().getSystemUser(),false);
 

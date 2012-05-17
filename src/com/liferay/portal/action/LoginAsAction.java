@@ -69,12 +69,7 @@ public class LoginAsAction extends Action {
 				Logger.info(this, "An invalid request to login as a different user was made by " + currentUser.getFullName() + 
 						" (" + currentUser.getUserId() + "), invalid user password submitted. Remote IP: " + req.getRemoteAddr());
 				return mapping.findForward(Constants.COMMON_REFERER);
-			} else if (currentUser.getPasswordEncrypted() && !currentUser.getPassword().equals(Encryptor.digest(passwordParameter))) {
-				req.getSession().setAttribute("portal_login_as_error", "please-enter-a-valid-password");
-				Logger.info(this, "An invalid request to login as a different user was made by " + currentUser.getFullName() + 
-						" (" + currentUser.getUserId() + "), invalid user password submitted. Remote IP: " + req.getRemoteAddr());
-				return mapping.findForward(Constants.COMMON_REFERER);
-			} else if (!currentUser.getPasswordEncrypted() && !currentUser.getPassword().equals(passwordParameter)) {
+			} else if (!currentUser.getPassword().equals(Encryptor.digest(passwordParameter))) {
 				req.getSession().setAttribute("portal_login_as_error", "please-enter-a-valid-password");
 				Logger.info(this, "An invalid request to login as a different user was made by " + currentUser.getFullName() + 
 						" (" + currentUser.getUserId() + "), invalid user password submitted. Remote IP: " + req.getRemoteAddr());

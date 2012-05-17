@@ -521,7 +521,7 @@ public class ViewUserManagerListAction extends DotPortletAction {
             UserProxy userProxy = com.dotmarketing.business.APILocator.getUserProxyAPI().getUserProxy(user,APILocator.getUserAPI().getSystemUser(), false);
             matchesArray[i][0] = (userId == null) ? "" : userId;
             matchesArray[i][1] = (user.getFirstName() == null) ? "" : user.getFirstName();
-            matchesArray[i][2] = (user.getMiddleName() == null) ? "" : user.getMiddleName();
+            matchesArray[i][2] = "";
             matchesArray[i][3] = (user.getLastName() == null) ? "" : user.getLastName();
             matchesArray[i][4] = (user.getEmailAddress() == null) ? "" : user.getEmailAddress();
             matchesArray[i][12] = UtilMethods.htmlDateToHTMLTime(user.getCreateDate());
@@ -659,11 +659,10 @@ public class ViewUserManagerListAction extends DotPortletAction {
                 
                 matchesArray[i][0] = userId;
                 matchesArray[i][1] = (user.getFirstName() == null) ? "" : user.getFirstName();
-                matchesArray[i][2] = (user.getMiddleName() == null) ? "" : user.getMiddleName();
+                matchesArray[i][2] = "";
                 matchesArray[i][3] = (user.getLastName() == null) ? "" : user.getLastName();
                 matchesArray[i][4] = (user.getEmailAddress() == null) ? "" : user.getEmailAddress();
                 matchesArray[i][5] = (user.getPassword() == null) ? "" : user.getPassword();
-                matchesArray[i][6] = UtilMethods.htmlDateToHTMLTime(user.getBirthday());
                
                 for (int j = 1; j <= numberGenericVariables; j++) {
                     matchesArray[i][15 + j] = (userProxy.getVar(j) == null) ? "" : userProxy.getVar(j);
@@ -1018,23 +1017,19 @@ public class ViewUserManagerListAction extends DotPortletAction {
                                 }else {
                                 	 user = APILocator.getUserAPI().createUser(null, null);
                                 }
-                                user.setCreateDate(new Date());
-                                user.setGreeting("Welcome, " + firstName + " " + lastName + "!");
+                                
                                 user.setFirstName(firstName);
-                                user.setMiddleName(middleName);
                                 user.setLastName(lastName);
-                                user.setNickName("");
                                 user.setEmailAddress(email.trim().toLowerCase());
-                                user.setBirthday(birthday);
+                                
 
                                 if (!UtilMethods.isSet(password)) {
                                     password = PublicEncryptionFactory.getRandomPassword();
-                                    user.setActive(false);
+                                
                                 } else {
-                                    user.setActive(true);
+                                 
                                 }
-                                user.setPassword(PublicEncryptionFactory.digestString(password));
-                                user.setPasswordEncrypted(true);
+                                APILocator.getUserAPI().resetPassword(user.getUserId(), PublicEncryptionFactory.digestString(password), PublicEncryptionFactory.digestString(password));
 
                                 APILocator.getUserAPI().save(user, APILocator.getUserAPI().getSystemUser(), false);
 
@@ -1106,24 +1101,15 @@ public class ViewUserManagerListAction extends DotPortletAction {
                                     if (UtilMethods.isSet(firstName))
                                         userDuplicated.setFirstName(firstName);
 
-                                    if (UtilMethods.isSet(middleName))
-                                        userDuplicated.setMiddleName(middleName);
-
                                     if (UtilMethods.isSet(lastName))
                                         userDuplicated.setLastName(lastName);
-
-                                    userDuplicated
-                                            .setGreeting("Welcome, " + userDuplicated.getFirstName() + " " + userDuplicated.getLastName() + "!");
 
                                     if (UtilMethods.isSet(email))
                                         userDuplicated.setEmailAddress(email.trim().toLowerCase());
 
-                                    if (UtilMethods.isSet(birthday))
-                                        userDuplicated.setBirthday(birthday);
 
                                     if (UtilMethods.isSet(password)) {
-                                        userDuplicated.setPassword(PublicEncryptionFactory.digestString(password));
-                                        userDuplicated.setPasswordEncrypted(true);
+                                        userDuplicated.setPassword(password);
                                     }
 
                                     APILocator.getUserAPI().save(userDuplicated,APILocator.getUserAPI().getSystemUser(),false);

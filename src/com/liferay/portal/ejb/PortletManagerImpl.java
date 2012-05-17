@@ -47,6 +47,7 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
+import com.dotmarketing.util.CompanyUtils;
 import com.dotmarketing.util.Logger;
 import com.liferay.portal.NoSuchPortletException;
 import com.liferay.portal.PortalException;
@@ -91,10 +92,6 @@ public class PortletManagerImpl
 
 	public Portlet getPortletById(String companyId, String portletId)
 		throws SystemException {
-
-		if (companyId.equals(User.DEFAULT)) {
-			throw new SystemException();
-		}
 
 		return (Portlet)_getPortletsPool(companyId).get(portletId);
 	}
@@ -287,7 +284,7 @@ public class PortletManagerImpl
 
 //		PortletPreferencesManagerUtil.deleteAllByGroup(groupId);
 
-		String companyId = getUser().getCompanyId();
+		String companyId = CompanyUtils.getDefaultCompany().getCompanyId();
 
 		if (!hasAdministrator(companyId)) {
 			throw new PrincipalException();

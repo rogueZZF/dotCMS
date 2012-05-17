@@ -156,28 +156,13 @@ public class CreateAccountAction extends DispatchAction {
 		Company company = PublicCompanyFactory.getDefaultCompany();
 		user.setEmailAddress(createAccountForm.getEmailAddress().trim().toLowerCase());
 		user.setFirstName(createAccountForm.getFirstName() == null ? "" : form.getFirstName());
-		user.setLastName(createAccountForm.getLastName() == null ? "" : form.getLastName());
-		user.setNickName("");
-		user.setMiddleName("");        
-		user.setCompanyId(company.getCompanyId());
+		user.setLastName(createAccountForm.getLastName() == null ? "" : form.getLastName());        
 		user.setLastLoginIP(request.getRemoteAddr());
 		user.setLastLoginDate(today);
 		user.setLoginIP(request.getRemoteAddr());
 		user.setLoginDate(today);
-		user.setPasswordEncrypted(true);
-		user.setPassword(PublicEncryptionFactory.digestString(form.getPassword1()));
-		user.setComments(form.getComments());
-		user.setGreeting("Welcome, " + user.getFullName() + "!");            
+		user.setPassword(form.getPassword1());            
 
-		//Set defaults values
-		if(user.isNew())
-		{
-			user.setLanguageId(defaultUser.getLanguageId());
-			user.setTimeZoneId(defaultUser.getTimeZoneId());
-			user.setLayoutIds("");        	
-			user.setActive(true);
-			user.setCreateDate(today);
-		}
 		APILocator.getUserAPI().save(user,APILocator.getUserAPI().getSystemUser(),false);
 
 
@@ -323,8 +308,7 @@ public class CreateAccountAction extends DispatchAction {
 			//createAccountForm.setUserName(user.getEmailAddress());
 			createAccountForm.setEmailAddress(user.getEmailAddress());
 			createAccountForm.setFirstName(user.getFirstName() == null ? "" : user.getFirstName());
-			createAccountForm.setLastName(user.getLastName() == null ? "" : user.getLastName());
-			createAccountForm.setComments(user.getComments());                            
+			createAccountForm.setLastName(user.getLastName() == null ? "" : user.getLastName());                          
 			//### END LOAD USER ###
 
 			//### LOAD USER_PROXY ###    			

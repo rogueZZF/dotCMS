@@ -40,7 +40,7 @@ public class UserIdValidator implements com.dotmarketing.auth.UserIdValidator {
 			Validator.isEmailAddress(userId) ||
 			(userId.equalsIgnoreCase("cyrus")) ||
 			(userId.equalsIgnoreCase("postfix")) ||
-			(userId.indexOf(User.DEFAULT) != -1) ||
+			(userId.indexOf("default") != -1) ||
 			(userId.indexOf(companyId) != -1) ||
 			(userId.indexOf("_") != -1)) {
 

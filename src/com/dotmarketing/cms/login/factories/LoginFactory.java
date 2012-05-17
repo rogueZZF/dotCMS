@@ -16,6 +16,7 @@ import com.dotmarketing.cms.factories.PublicEncryptionFactory;
 import com.dotmarketing.cms.login.struts.LoginForm;
 import com.dotmarketing.portal.struts.DotCustomLoginPostAction;
 import com.dotmarketing.util.Config;
+import com.dotmarketing.util.InodeUtils;
 import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
 import com.dotmarketing.util.WebKeys;
@@ -133,8 +134,8 @@ public class LoginFactory {
 	            	throw new NoSuchUserException();
 	            }
 	            
-	            if (user.isNew() || 
-	            		(!Config.getBooleanProperty("ALLOW_INACTIVE_ACCOUNTS_TO_LOGIN", false) && !user.isActive())) {
+	            if (InodeUtils.isSet(user.getInode()) || 
+	            		(!Config.getBooleanProperty("ALLOW_INACTIVE_ACCOUNTS_TO_LOGIN", false) && user.isArchived())) {
 	            	  return false;
 	            }
 	            

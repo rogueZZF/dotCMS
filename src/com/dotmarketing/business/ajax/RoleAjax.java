@@ -186,7 +186,7 @@ public class RoleAjax {
 			if(userList != null)
 				for(User u : userList) {
 					if(!userSet.contains(u)) {
-						userMaps.add(u.toMap());
+						userMaps.add(u.getMap());
 						userSet.add(u);
 					}
 				}
@@ -223,7 +223,7 @@ public class RoleAjax {
 		User user = uAPI.loadUserById(userId, uWebAPI.getLoggedInUser(request), !uWebAPI.isLoggedToBackend(request));
 		roleAPI.addRoleToUser(role, user);
 
-		return user.toMap();
+		return user.getMap();
 
 	}
 

@@ -289,29 +289,19 @@ public final class SubmitWebFormAction extends DispatchAction {
 		User defaultUser = APILocator.getUserAPI().getDefaultUser();
 		Date today = new Date();
 
-		if (user.isNew() || (!user.isNew() && user.getLastLoginDate() == null)) {
+		if (!InodeUtils.isSet(user.getInode()) || (InodeUtils.isSet(user.getInode()) && user.getLastLoginDate() == null)) {
 
 			// ### CREATE USER ###
 			Company company = PublicCompanyFactory.getDefaultCompany();
 			user.setEmailAddress(form.getEmail().trim().toLowerCase());
 			user.setFirstName(form.getFirstName() == null ? "" : form.getFirstName());
-			user.setMiddleName(form.getMiddleName() == null ? "" : form.getMiddleName());
 			user.setLastName(form.getLastName() == null ? "" : form.getLastName());
-			user.setNickName("");
-			user.setCompanyId(company.getCompanyId());
-			user.setPasswordEncrypted(true);
-			user.setGreeting("Welcome, " + user.getFullName() + "!");
 
 			// Set defaults values
-			if (user.isNew()) {
+			if (!InodeUtils.isSet(user.getInode())) {
 				//if it's a new user we set random password
 				String pass = PublicEncryptionFactory.getRandomPassword();
-				user.setPassword(PublicEncryptionFactory.digestString(pass));
-				user.setLanguageId(defaultUser.getLanguageId());
-				user.setTimeZoneId(defaultUser.getTimeZoneId());
-				user.setLayoutIds("");
-				user.setActive(true);
-				user.setCreateDate(today);
+				user.setPassword(pass);
 			}
 			APILocator.getUserAPI().save(user,APILocator.getUserAPI().getSystemUser(),false);
 			// ### END CREATE USER ###

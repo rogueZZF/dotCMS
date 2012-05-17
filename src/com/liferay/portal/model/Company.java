@@ -104,7 +104,7 @@ public class Company extends CompanyModel {
 
 	public Locale getLocale() {
 		try {
-			return APILocator.getUserAPI().getSystemUser().getLocale();
+//			return APILocator.getUserAPI().getSystemUser().getLocale();
 		} catch (DotDataException e) {
 			Logger.error(Company.class,e.getMessage(),e);
 		}
@@ -113,7 +113,7 @@ public class Company extends CompanyModel {
 
 	public TimeZone getTimeZone() {
 		try{
-			return APILocator.getUserAPI().getSystemUser().getTimeZone();
+//			return APILocator.getUserAPI().getSystemUser().getTimeZone();
 		} catch (DotDataException e) {
 			Logger.error(Company.class,e.getMessage(),e);
 		}

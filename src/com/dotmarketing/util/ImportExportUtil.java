@@ -1295,8 +1295,7 @@ public class ImportExportUtil {
             }else if (_importClass.equals(User.class)) {
                 for (int j = 0; j < l.size(); j++) {
                     User u = (User)l.get(j);
-                    u.setModified(true);
-                    if(!u.isDefaultUser() && !u.getUserId().equals("system")){
+                    if(!u.getUserId().equals("system") && !u.getUserId().equalsIgnoreCase("default")){
                         try{
                             User u1 = APILocator.getUserAPI().createUser(u.getUserId(), u.getEmailAddress());
                             u.setUserId(u1.getUserId());

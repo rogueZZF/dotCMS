@@ -354,16 +354,7 @@ public class EditUserManagerAction extends DotPortletAction{
 
 		user.setFirstName(userForm.getFirstName());
 
-		if (userForm.getMiddleName() != null)
-			user.setMiddleName(userForm.getMiddleName());
-
 		user.setLastName(userForm.getLastName());
-
-		if (userForm.getDateOfBirthDate() != null)
-			user.setBirthday(userForm.getDateOfBirthDate());
-
-		if (userForm.getNickName() != null)
-			user.setNickName(userForm.getNickName());
 
 		if(UtilMethods.isSet(userForm.getChallengeQuestionId()) && UtilMethods.isInt(userForm.getChallengeQuestionId())){
 			userProxy.setChallengeQuestionId(userForm.getChallengeQuestionId());
@@ -391,13 +382,11 @@ public class EditUserManagerAction extends DotPortletAction{
 			user.setEmailAddress(userForm.getEmailAddress().trim().toLowerCase());
 
 		if ((userForm.getNewPassword() != null) && (!userForm.getNewPassword().equals(""))) {
-			user.setPassword(PublicEncryptionFactory.digestString(userForm.getNewPassword()));
-			user.setPasswordEncrypted(true);
+			user.setPassword(userForm.getNewPassword());
 		}
 
-		if (user.isNew() || userForm.getPassChanged().equals("true")) {
-			user.setPassword(PublicEncryptionFactory.digestString(userForm.getPassword()));
-			user.setPasswordEncrypted(true);
+		if (!InodeUtils.isSet(user.getInode()) || userForm.getPassChanged().equals("true")) {
+			user.setPassword(userForm.getPassword());
 		}
 
 		APILocator.getUserAPI().save(user,APILocator.getUserAPI().getSystemUser(),false);
@@ -501,8 +490,6 @@ public class EditUserManagerAction extends DotPortletAction{
 			member = APILocator.getUserAPI().createUser(null, null);
 			
 		}
-		member.setActive(true);
-		member.setCreateDate(new Date());
 		return member;
 	}
 
@@ -513,7 +500,7 @@ public class EditUserManagerAction extends DotPortletAction{
 		ActionErrors aes = new ActionErrors();
 
 		User user = APILocator.getUserAPI().loadByUserByEmail(userForm.getEmailAddress(), APILocator.getUserAPI().getSystemUser(), false);
-		if(user.isNew())
+		if(!InodeUtils.isSet(user.getInode()))
 		{
 			aes = new ActionErrors();
 			aes.add(Globals.ERROR_KEY, new ActionMessage("error.forgotPasswordUserNotFound"));
@@ -521,7 +508,7 @@ public class EditUserManagerAction extends DotPortletAction{
 			return;
 		}
 		String pass = PublicEncryptionFactory.getRandomPassword();
-		user.setPassword(PublicEncryptionFactory.digestString(pass));
+		user.setPassword(pass);
 		APILocator.getUserAPI().save(user,APILocator.getUserAPI().getSystemUser(),false);
 		Host host = WebAPILocator.getHostWebAPI().getCurrentHost(request);
 		EmailFactory.sendForgotPassword(user, pass, host.getIdentifier());

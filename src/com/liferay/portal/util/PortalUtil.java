@@ -595,7 +595,7 @@ public class PortalUtil {
 			userId = WebAPILocator.getUserWebAPI().getLoggedInUser(req).getUserId();
 		} catch (Exception e) {
 			Logger.debug(PortalUtil.class, "Unable to get logged in User Setting to default user: " + e.getMessage(), e);
-			userId = User.getDefaultUserId(companyId);
+			userId = "default";
 		}
 		String layoutId = PortletKeys.SHARED_PREF_ID; //I think this is right JT
 
@@ -622,7 +622,7 @@ public class PortalUtil {
 //		}
 
 		if (userId == null) {
-			userId = User.getDefaultUserId(companyId);
+			userId = "default";
 		}
 
 		PortletPreferencesPK pk = new PortletPreferencesPK(

@@ -8,6 +8,7 @@ import com.dotmarketing.exception.DotDataException;
 import com.dotmarketing.exception.DotRuntimeException;
 import com.dotmarketing.exception.DotSecurityException;
 import com.dotmarketing.util.Config;
+import com.dotmarketing.util.InodeUtils;
 import com.dotmarketing.util.UtilMethods;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.User;
@@ -54,7 +55,7 @@ public class UserAPIImpl implements UserAPI {
 			throw new DotDataException("You must specifiy an email to search for");
 		}
 		User u = uf.loadByUserByEmail(email);
-		if(!UtilMethods.isSet(u)){
+		if(!UtilMethods.isSet(u) || !InodeUtils.isSet(u.getInode())){
 			throw new com.dotmarketing.business.NoSuchUserException("No user found with passed in email");
 		}
 		if(perAPI.doesUserHavePermission(upAPI.getUserProxy(u,APILocator.getUserAPI().getSystemUser(), false), PermissionAPI.PERMISSION_READ, user, respectFrontEndRoles)){
@@ -108,7 +109,6 @@ public class UserAPIImpl implements UserAPI {
 			user.setFirstName("system user");
 			user.setLastName("system user");
 			user.setCreateDate(new java.util.Date());
-			user.setCompanyId(PublicCompanyFactory.getDefaultCompanyId());
 			uf.saveUser(user);
 		}
 		if(!roleAPI.doesUserHaveRole(user, cmsAdminRole))
@@ -126,15 +126,12 @@ public class UserAPIImpl implements UserAPI {
 			user.setUserId("anonymous");
 			user.setFirstName("anonymous user");
 			user.setCreateDate(new java.util.Date());
-			user.setCompanyId(PublicCompanyFactory.getDefaultCompanyId());
 			uf.saveUser(user);
 			com.dotmarketing.business.APILocator.getRoleAPI().addRoleToUser(com.dotmarketing.business.APILocator.getRoleAPI().loadRoleByKey(Config.getStringProperty("CMS_ANONYMOUS_ROLE")).getId(), user);
 		} catch (NoSuchUserException e) {
 			user = createUser("anonymous", "anonymous@dotcmsfakeemail.org");
 			user.setUserId("anonymous");
 			user.setFirstName("anonymous user");
-			user.setCreateDate(new java.util.Date());
-			user.setCompanyId(PublicCompanyFactory.getDefaultCompanyId());
 			uf.saveUser(user);
 			com.dotmarketing.business.APILocator.getRoleAPI().addRoleToUser(com.dotmarketing.business.APILocator.getRoleAPI().loadCMSAnonymousRole().getId(), user);
 		}

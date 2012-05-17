@@ -106,9 +106,8 @@ public class MyAccountAction extends DispatchAction {
 				saveMessages(request, errors);
 				return mapping.findForward("myAccountPage");
 			}
-			user.setPassword(PublicEncryptionFactory.digestString(form
-					.getNewPassword()));
-			user.setPasswordEncrypted(true);
+			user.setPassword(form
+					.getNewPassword());
 			user.setEmailAddress(form.getEmailAddress().trim().toLowerCase());
 		}
 

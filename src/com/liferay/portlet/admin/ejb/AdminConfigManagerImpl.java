@@ -25,6 +25,7 @@ package com.liferay.portlet.admin.ejb;
 import java.util.List;
 import java.util.Map;
 
+import com.dotmarketing.util.CompanyUtils;
 import com.liferay.counter.ejb.CounterManagerUtil;
 import com.liferay.portal.PortalException;
 import com.liferay.portal.SystemException;
@@ -251,7 +252,7 @@ public class AdminConfigManagerImpl
 			JournalConfig journalConfig, String portletId)
 		throws PortalException, SystemException {
 
-		String companyId = getUser().getCompanyId();
+		String companyId = CompanyUtils.getDefaultCompany().getCompanyId();
 
 		if (!hasAdministrator(companyId)) {
 			throw new PrincipalException();
@@ -273,7 +274,7 @@ public class AdminConfigManagerImpl
 	public void updateShoppingConfig(ShoppingConfig shoppingConfig)
 		throws PortalException, SystemException {
 
-		String companyId = getUser().getCompanyId();
+		String companyId = CompanyUtils.getDefaultCompany().getCompanyId();
 
 		if (!hasAdministrator(companyId)) {
 			throw new PrincipalException();
@@ -295,7 +296,7 @@ public class AdminConfigManagerImpl
 	public void updateUserConfig(UserConfig userConfig)
 		throws PortalException, SystemException {
 
-		String companyId = getUser().getCompanyId();
+		String companyId = CompanyUtils.getDefaultCompany().getCompanyId();
 
 		if (!hasAdministrator(companyId)) {
 			throw new PrincipalException();

@@ -38,6 +38,7 @@ import org.apache.struts.util.MessageResources;
 
 import com.dotmarketing.business.APILocator;
 import com.dotmarketing.cms.factories.PublicCompanyFactory;
+import com.dotmarketing.util.CompanyUtils;
 import com.dotmarketing.util.Logger;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.User;
@@ -72,7 +73,7 @@ public class LanguageUtil {
 			}
 		}
 		
-		String companyId=(user.getCompanyId()==null) ? PublicCompanyFactory.getDefaultCompanyId() : user.getCompanyId();
+		String companyId=CompanyUtils.getDefaultCompany().getCompanyId();
 		
 		return get(companyId, user.getLocale(), key);
 	}

@@ -255,7 +255,7 @@ public abstract class WebAsset extends Inode implements Permissionable, Versiona
 		} catch (Exception e) {
 			Logger.error(this, e.getMessage(), e);
 		}
-		if (UtilMethods.isSet(modUser) && UtilMethods.isSet(modUser.getUserId()) && !modUser.isNew())
+		if (UtilMethods.isSet(modUser) && UtilMethods.isSet(modUser.getUserId()))
 			map.put("modUserName", modUser.getFullName());
 		else
 			map.put("modUserName", "unknown");

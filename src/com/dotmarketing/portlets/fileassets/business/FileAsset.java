@@ -241,7 +241,7 @@ public class FileAsset extends Contentlet implements IFileAsset {
 		} catch (Exception e) {
 			Logger.error(this, e.getMessage(), e);
 		}
-		if (UtilMethods.isSet(modUser) && UtilMethods.isSet(modUser.getUserId()) && !modUser.isNew())
+		if (UtilMethods.isSet(modUser) && UtilMethods.isSet(modUser.getUserId()) && UtilMethods.isSet(modUser.getInode()))
 			map.put("modUserName", modUser.getFullName());
 		else
 			map.put("modUserName", "unknown");

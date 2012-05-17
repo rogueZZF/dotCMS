@@ -23,7 +23,6 @@
 package com.liferay.portal.struts;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,7 +54,7 @@ import com.dotmarketing.exception.DotDataException;
 import com.dotmarketing.exception.DotSecurityException;
 import com.dotmarketing.factories.PreviewFactory;
 import com.dotmarketing.portlets.contentlet.business.HostAPI;
-import com.dotmarketing.portlets.user.business.UserUtil;
+import com.dotmarketing.util.CompanyUtils;
 import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
 import com.liferay.portal.PortalException;
@@ -73,7 +72,6 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.util.Constants;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
-import com.liferay.portal.util.WebAppPool;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.CachePortlet;
 import com.liferay.portlet.RenderRequestImpl;
@@ -357,20 +355,9 @@ public class PortalRequestProcessor extends StxxTilesRequestProcessor {
 			return _PATH_PORTAL_LOGOUT;
 		}
 
-		// Authenticated users must agree to Terms of Use
-
-		if ((user != null) && (!user.isAgreedToTermsOfUse())) {
-			boolean termsOfUseRequired = GetterUtil.get(
-				PropsUtil.get(PropsUtil.TERMS_OF_USE_REQUIRED), true);
-
-			if (termsOfUseRequired) {
-				return _PATH_PORTAL_TERMS_OF_USE;
-			}
-		}
-
 		// Authenticated users must be active
 
-		if ((user != null) && (!user.isActive())) {
+		if ((user != null) && (user.isArchived())) {
 			SessionErrors.add(req, UserActiveException.class.getName());
 
 			return _PATH_PORTAL_ERROR;
@@ -482,10 +469,10 @@ public class PortalRequestProcessor extends StxxTilesRequestProcessor {
 				 
 				if(host != null && pAPI.doesUserHavePermission(host, PermissionAPI.PERMISSION_READ, user, false)){
 					req.getSession().setAttribute(com.dotmarketing.util.WebKeys.CMS_SELECTED_HOST_ID, req.getParameter("host_id"));
-					UserUtil.setLastHost(user, host);
+//					UserUtil.setLastHost(user, host);
 				}
 				else{
-					UserUtil.setLastHost(user, null);
+//					UserUtil.setLastHost(user, null);
 					req.getSession().removeAttribute(com.dotmarketing.util.WebKeys.CMS_SELECTED_HOST_ID);
 					Logger.info(this.getClass(), "user " + user.getUserId() + " does not have permission to host " +req.getParameter("host_id"));
 				}
@@ -506,7 +493,7 @@ public class PortalRequestProcessor extends StxxTilesRequestProcessor {
 				else{
 					Logger.error(this.getClass(), "user " + user.getUserId() + " does not have permission to host " +req.getSession().getAttribute(com.dotmarketing.util.WebKeys.CMS_SELECTED_HOST_ID));
 					req.getSession().removeAttribute(com.dotmarketing.util.WebKeys.CMS_SELECTED_HOST_ID);
-					UserUtil.setLastHost(user,null);
+//					UserUtil.setLastHost(user,null);
 				}
 			}
 			catch(Exception e){
@@ -519,7 +506,7 @@ public class PortalRequestProcessor extends StxxTilesRequestProcessor {
 		else{
 			
 				try {
-					host = UserUtil.getLastHost(user);
+//					host = UserUtil.getLastHost(user);
 					req.getSession().setAttribute(com.dotmarketing.util.WebKeys.CMS_SELECTED_HOST_ID, host.getIdentifier());
 				} catch (DotDataException e) {
 					Logger.debug(this.getClass(), e.toString());
@@ -648,7 +635,7 @@ public class PortalRequestProcessor extends StxxTilesRequestProcessor {
 					1, path.lastIndexOf(StringPool.SLASH));
 
 				Portlet portlet = PortletManagerUtil.getPortletByStrutsPath(
-					user.getCompanyId(), strutsPath);
+						CompanyUtils.getDefaultCompany().getCompanyId(), strutsPath);
 
 				if (portlet != null && portlet.isActive()) {
 //					if (!RoleLocalManagerUtil.hasRoles(user.getUserId(), portlet.getRolesArray())) {

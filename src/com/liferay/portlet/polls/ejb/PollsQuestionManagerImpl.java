@@ -27,6 +27,7 @@ import java.util.List;
 
 import com.dotmarketing.business.APILocator;
 import com.dotmarketing.business.Role;
+import com.dotmarketing.util.CompanyUtils;
 import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
 import com.liferay.portal.PortalException;
@@ -152,12 +153,6 @@ public class PollsQuestionManagerImpl
 
 		User user = getUser();
 
-		PollsQuestion question = getQuestion(questionId);
-
-		if (!question.getCompanyId().equals(user.getCompanyId())) {
-			throw new PrincipalException();
-		}
-
 		PollsQuestionLocalManagerUtil.vote(
 			user.getUserId(), questionId, choiceId);
 	}
@@ -171,7 +166,7 @@ public class PollsQuestionManagerImpl
 
 		try {
 			if ((question.getUserId().equals(getUserId())) ||
-				(getUser().getCompanyId().equals(question.getCompanyId()) &&
+				(CompanyUtils.getDefaultCompany().getCompanyId().equals(question.getCompanyId()) &&
 				APILocator.getRoleAPI().doesUserHaveRole(APILocator.getUserAPI().loadUserById(getUserId(),APILocator.getUserAPI().getSystemUser(),true), Role.POLLS_ADMIN))) {
 
 				return true;

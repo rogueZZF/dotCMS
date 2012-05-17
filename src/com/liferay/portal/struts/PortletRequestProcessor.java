@@ -45,6 +45,7 @@ import org.apache.struts.action.ActionServlet;
 import org.apache.struts.config.ForwardConfig;
 import org.apache.struts.config.ModuleConfig;
 
+import com.dotmarketing.util.CompanyUtils;
 import com.dotmarketing.util.Logger;
 import com.liferay.portal.ejb.PortletManagerUtil;
 import com.liferay.portal.model.Portlet;
@@ -231,7 +232,7 @@ public class PortletRequestProcessor extends StxxTilesRequestProcessor {
 					1, path.lastIndexOf(StringPool.SLASH));
 
 				Portlet portlet = PortletManagerUtil.getPortletByStrutsPath(
-					user.getCompanyId(), strutsPath);
+						CompanyUtils.getDefaultCompany().getCompanyId(), strutsPath);
 
 				if (portlet != null && portlet.isActive()) {
 //					if (!RoleLocalManagerUtil.hasRoles(

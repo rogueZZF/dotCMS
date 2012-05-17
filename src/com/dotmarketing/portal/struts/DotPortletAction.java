@@ -184,7 +184,7 @@ public class DotPortletAction extends PortletAction {
 
 		if (WebAssetFactory.archiveAsset(webAsset, user.getUserId())) {
 			SessionMessages.add(httpReq, "message", "message." + webAsset.getType() + ".delete");
-			ActivityLogger.logInfo(this.getClass(), "Delete WebAsset action", "User " + user.getPrimaryKey() + " deleting" + webAsset.getType()+" named "+webAsset.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
+			ActivityLogger.logInfo(this.getClass(), "Delete WebAsset action", "User " + user.getUserId() + " deleting" + webAsset.getType()+" named "+webAsset.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
 		} else {
 			SessionMessages.add(httpReq, "message", "message." + webAsset.getType() + ".delete.locked");
 		}
@@ -219,7 +219,7 @@ public class DotPortletAction extends PortletAction {
 		if (InodeUtils.isSet(webAsset.getInode())) {
 			// calls the asset factory edit
 			if (WebAssetFactory.unPublishAsset(webAsset, userId, parent)) {
-				ActivityLogger.logInfo(this.getClass(), "Unpublish WebAsset action", "User " + user.getPrimaryKey() + " unpublishing" + webAsset.getType()+" named "+webAsset.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
+				ActivityLogger.logInfo(this.getClass(), "Unpublish WebAsset action", "User " + user.getUserId() + " unpublishing" + webAsset.getType()+" named "+webAsset.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
 				SessionMessages.add(httpReq, "message", "message." + webAsset.getType() + ".unpublished");
 			} else {
 				SessionMessages.add(httpReq, "message", "message." + webAsset.getType() + ".unpublish.notlive_or_locked");
@@ -373,7 +373,7 @@ public class DotPortletAction extends PortletAction {
 
 			WebAsset webAsset = (WebAsset) req.getAttribute(formWebKey);
 			Logger.debug(this, "WEB ASSET " + webAsset.getType() + " TO PUBLISH=" + webAsset.getInode());
-			ActivityLogger.logInfo(this.getClass(), "Publish WebAsset action", "User " + user.getPrimaryKey() + " publishing" + webAsset.getType()+" named "+webAsset.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
+			ActivityLogger.logInfo(this.getClass(), "Publish WebAsset action", "User " + user.getUserId() + " publishing" + webAsset.getType()+" named "+webAsset.getTitle(), HostUtil.hostNameUtil(req, _getUser(req)));
 
 			// Checking permissions
 			_checkUserPermissions(webAsset, user, PERMISSION_PUBLISH);

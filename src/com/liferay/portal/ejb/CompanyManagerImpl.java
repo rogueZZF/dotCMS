@@ -32,6 +32,7 @@ import com.dotmarketing.business.APILocator;
 import com.dotmarketing.common.db.DotConnect;
 import com.dotmarketing.db.DbConnectionFactory;
 import com.dotmarketing.exception.DotRuntimeException;
+import com.dotmarketing.util.CompanyUtils;
 import com.dotmarketing.util.Logger;
 import com.liferay.portal.PortalException;
 import com.liferay.portal.SystemException;
@@ -56,7 +57,7 @@ public class CompanyManagerImpl
 
 	public Company getCompany() throws PortalException, SystemException {
 		Company company =
-			CompanyUtil.findByPrimaryKey(getUser().getCompanyId());
+			CompanyUtil.findByPrimaryKey(CompanyUtils.getDefaultCompany().getCompanyId());
 
 		return (Company)company.getProtected();
 	}
@@ -78,7 +79,7 @@ public class CompanyManagerImpl
 		throws PortalException, SystemException {
 
 		Company company =
-			CompanyUtil.findByPrimaryKey(getUser().getCompanyId());
+			CompanyUtil.findByPrimaryKey(CompanyUtils.getDefaultCompany().getCompanyId());
 
 		if (!hasAdministrator(company.getCompanyId())) {
 			throw new PrincipalException();
@@ -118,7 +119,7 @@ public class CompanyManagerImpl
 	}
 	
 	public void updateLogo(File file) throws PortalException, SystemException {
-		String companyId = getUser().getCompanyId();
+		String companyId = CompanyUtils.getDefaultCompany().getCompanyId();
 
 		if (!hasAdministrator(companyId)) {
 			throw new PrincipalException();
@@ -156,17 +157,11 @@ public class CompanyManagerImpl
 		throws PortalException, SystemException {
 
 		Company company =
-			CompanyUtil.findByPrimaryKey(getUser().getCompanyId());
+			CompanyUtil.findByPrimaryKey(CompanyUtils.getDefaultCompany().getCompanyId());
 
 		if (!hasAdministrator(company.getCompanyId())) {
 			throw new PrincipalException();
 		}
-		user.setLanguageId(languageId);
-		user.setTimeZoneId(timeZoneId);
-		user.setSkinId(skinId);
-		user.setDottedSkins(dottedSkins);
-		user.setRoundedSkins(roundedSkins);
-		user.setResolution(resolution);
 
 		try {
 			APILocator.getUserAPI().save(user, APILocator.getUserAPI().getSystemUser(), true);
@@ -191,7 +186,7 @@ public class CompanyManagerImpl
 			rs = DbConnectionFactory.getDBTrue();
 		
 		Company company =
-			CompanyUtil.findByPrimaryKey(getUser().getCompanyId());
+			CompanyUtil.findByPrimaryKey(CompanyUtils.getDefaultCompany().getCompanyId());
 	     try{
 			DotConnect dc = new DotConnect();
 			dc.setSQL("update user_ set languageid = ?, timezoneid = ?, skinid = ?, dottedskins = " + rs + ", roundedskins = " + ds + ", resolution = ? where companyid = ?");
