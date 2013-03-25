@@ -14,6 +14,7 @@ import com.dotmarketing.portlets.structure.factories.FieldFactoryTest;
 import com.dotmarketing.portlets.structure.factories.StructureFactoryTest;
 import com.dotmarketing.portlets.templates.business.TemplateAPITest;
 import com.dotcms.publisher.endpoint.business.*;
+import com.dotcms.dbschema.*;
 
 /**
  * Created by Jonathan Gamba.
@@ -32,7 +33,8 @@ import com.dotcms.publisher.endpoint.business.*;
         //LinkCheckerAPITest.class,
         TemplateAPITest.class,
         HTMLPageAPITest.class,
-        PublishingEndPointAPITest.class
+        PublishingEndPointAPITest.class,
+        WorkflowSchemaConstraintsTest.class
 
 //        CMISBaseTest.class
 } )
