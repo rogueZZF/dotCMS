@@ -15,6 +15,7 @@ import com.dotmarketing.portlets.structure.factories.StructureFactoryTest;
 import com.dotmarketing.portlets.templates.business.TemplateAPITest;
 import com.dotcms.publisher.endpoint.business.*;
 import com.dotcms.dbschema.*;
+import com.dotcms.dbschema.workflow.WorkflowTaskConstraintsTest;
 
 /**
  * Created by Jonathan Gamba.
@@ -34,7 +35,7 @@ import com.dotcms.dbschema.*;
         TemplateAPITest.class,
         HTMLPageAPITest.class,
         PublishingEndPointAPITest.class,
-        WorkflowSchemaConstraintsTest.class
+        WorkflowTaskConstraintsTest.class
 
 //        CMISBaseTest.class
 } )
