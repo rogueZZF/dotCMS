@@ -63,8 +63,8 @@ public class CMISBaseTest extends TestBase {
         dotRepo.setCallContext(callContext);
     }
     
-    protected static String getdefaultHostId(){
-    	return getRootFolderChildren().getObjects().get(0).getObject().getId();
+    protected static String getdefaultHostId() throws Exception {
+        return getRootFolderChildren().getObjects().get(0).getObject().getId();
     }
     
     protected static ObjectInFolderList getRootFolderChildren(){
