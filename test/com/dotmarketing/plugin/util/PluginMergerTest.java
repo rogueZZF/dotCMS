@@ -9,9 +9,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.Test;
 
 import com.dotcms.TestBase;
+import com.dotmarketing.servlets.test.ServletTestRunner;
 import com.liferay.util.FileUtil;
 
 public class PluginMergerTest extends TestBase {
@@ -20,7 +23,8 @@ public class PluginMergerTest extends TestBase {
 	public void testMergeByAttribute() throws IOException {
 		PluginFileMerger fileMerger = new PluginFileMerger();
 
-		String rootPath = System.getProperty( "user.dir" ) + File.separator + "dotCMS";
+		HttpServletRequest request = ServletTestRunner.localRequest.get();
+		String realPath = request.getSession().getServletContext().getRealPath("/");
 		String name = "override-test";
 		String dwr = "<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\">\n"
 				+ "<param name=\"class\" value=\"com.arqiva.plugins.ajax.ArqivaUserAjax\"/>\n"
@@ -30,10 +34,10 @@ public class PluginMergerTest extends TestBase {
 		overrideMap.put("create", "javascript");
 
 
-		File dwrFile = new File(rootPath + File.separator + "WEB-INF"
+		File dwrFile = new File(realPath + "WEB-INF"
 				+ File.separator + "dwr.xml");
 
-		File dwrCopy = new File(rootPath + File.separator + "WEB-INF"
+		File dwrCopy = new File(realPath + "WEB-INF"
 				+ File.separator + "dwr-test.xml");
 
 		FileUtil.copyFile(dwrFile, dwrCopy, false);
