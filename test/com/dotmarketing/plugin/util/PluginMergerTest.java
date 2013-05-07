@@ -2,20 +2,15 @@ package com.dotmarketing.plugin.util;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Test;
 
 import com.dotcms.TestBase;
-import com.dotmarketing.servlets.test.ServletTestRunner;
-import com.liferay.util.FileUtil;
 
 public class PluginMergerTest extends TestBase {
 
@@ -23,8 +18,6 @@ public class PluginMergerTest extends TestBase {
 	public void testMergeByAttribute() throws IOException {
 		PluginFileMerger fileMerger = new PluginFileMerger();
 
-		HttpServletRequest request = ServletTestRunner.localRequest.get();
-		String realPath = request.getSession().getServletContext().getRealPath("/");
 		String name = "override-test";
 		String dwr = "<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\">\n"
 				+ "<param name=\"class\" value=\"com.arqiva.plugins.ajax.ArqivaUserAjax\"/>\n"
@@ -33,43 +26,35 @@ public class PluginMergerTest extends TestBase {
 		Map<String,String> overrideMap = new HashMap<String, String>();
 		overrideMap.put("create", "javascript");
 
+		StringBuilder sb = new StringBuilder("<!DOCTYPE dwr PUBLIC \"-//GetAhead Limited//DTD Direct Web Remoting 3.0//EN\" \"http://getahead.org/dwr//dwr30.dtd\">");
+		sb.append("<dwr>");
+		sb.append("<allow>");
+		sb.append("<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\">");
+		sb.append("<param name=\"class\" value=\"com.dotmarketing.portlets.user.ajax.UserAjax\"/>");
+		sb.append("</create>");
+		sb.append("<!-- Don't ever delete the following comment tags, it will break the plugin system -->");
+		sb.append("<!-- BEGIN PLUGINS -->");
+		sb.append("<!-- END PLUGINS -->");
+		sb.append("</allow>");
+		sb.append("</dwr>");
 
-		File dwrFile = new File(realPath + "WEB-INF"
-				+ File.separator + "dwr.xml");
+		InputStream input = new ByteArrayInputStream(sb.toString().getBytes());
 
-		File dwrCopy = new File(realPath + "WEB-INF"
-				+ File.separator + "dwr-test.xml");
+		String fileContent = fileMerger.mergeByAttribute(input, "<!-- BEGIN PLUGINS -->",
+				"<!-- END PLUGINS -->", "<!-- BEGIN PLUGIN:" + name + " -->", "<!-- END PLUGIN:" + name + " -->", dwr,
+				overrideMap, "<!-- BEGIN OVERRIDE:" + name, " END OVERRIDE:" + name + " -->", "<!-- BEGIN OVERRIDE");
 
-		FileUtil.copyFile(dwrFile, dwrCopy, false);
+		String newline = System.getProperty("line.separator");
 
+		String comentedPart = "<!-- BEGIN OVERRIDE:override-test"
+				+ newline + "<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\"><param name=\"class\" value=\"com.dotmarketing.portlets.user.ajax.UserAjax\"/></create>"
+				+ newline + " END OVERRIDE:override-test -->";
 
-		fileMerger.mergeByAttribute(dwrCopy, "<!-- BEGIN PLUGINS -->",
-				"<!-- END PLUGINS -->", "<!-- BEGIN PLUGIN:" + name + " -->",
-				"<!-- END PLUGIN:" + name + " -->", dwr, overrideMap,
-				"<!-- BEGIN OVERRIDE:" + name,
-				" END OVERRIDE:" + name + " -->", "<!-- BEGIN OVERRIDE");
-
-
-		FileReader fr = new FileReader(dwrCopy);
-		BufferedReader br = new BufferedReader(fr);
-		StringBuilder fileContent = new StringBuilder();
-		String line = null;
-
-		while((line=br.readLine())!=null) {
-			fileContent.append(line);
-		}
-
-		br.close();
-
-		String comentedPart = "<!-- BEGIN OVERRIDE:dwr-override<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\">"
-				+ "      <param name=\"class\" value=\"com.dotmarketing.portlets.user.ajax.UserAjax\"/>"
-				+ "    </create> END OVERRIDE:dwr-override -->";
-
-		String newPart = "<!-- BEGIN PLUGIN:dwr-override --><!-- BEGIN OVERRIDE:override-test<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\">"
-				+ "      <param name=\"class\" value=\"com.arqiva.plugins.ajax.ArqivaUserAjax\"/>"
-				+ "   </create> END OVERRIDE:override-test --><!-- END PLUGIN:dwr-override -->";
-
-		System.out.println(fileContent);
+		String newPart = "<!-- BEGIN PLUGIN:override-test -->"
+				+ newline + "<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\">"
+				+ newline + "<param name=\"class\" value=\"com.arqiva.plugins.ajax.ArqivaUserAjax\"/>"
+				+ newline + "</create>"
+				+ newline + "<!-- END PLUGIN:override-test -->";
 
 		assertTrue(fileContent.toString().contains(comentedPart));
 		assertTrue(fileContent.toString().contains(newPart));
