@@ -1,4 +1,4 @@
-package com.dotmarketing.plugin.util;
+package com.dotmarketing.plugin;
 
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +11,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.dotcms.TestBase;
+import com.dotmarketing.plugin.util.PluginFileMerger;
 
 public class PluginMergerTest extends TestBase {
 
@@ -19,14 +20,19 @@ public class PluginMergerTest extends TestBase {
 		PluginFileMerger fileMerger = new PluginFileMerger();
 
 		String name = "override-test";
-		String dwr = "<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\">\n"
-				+ "<param name=\"class\" value=\"com.arqiva.plugins.ajax.ArqivaUserAjax\"/>\n"
-				+ "</create>";
+
+		StringBuilder sb = new StringBuilder();
+		String newline = System.getProperty("line.separator");
+
+		sb.append("<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\">");
+		sb.append(newline).append("<param name=\"class\" value=\"com.arqiva.plugins.ajax.ArqivaUserAjax\"/>");
+		sb.append(newline).append("</create>");
+
+		String dwr = sb.toString();
 
 		Map<String,String> overrideMap = new HashMap<String, String>();
 		overrideMap.put("create", "javascript");
-
-		StringBuilder sb = new StringBuilder("<!DOCTYPE dwr PUBLIC \"-//GetAhead Limited//DTD Direct Web Remoting 3.0//EN\" \"http://getahead.org/dwr//dwr30.dtd\">");
+		sb = new StringBuilder("<!DOCTYPE dwr PUBLIC \"-//GetAhead Limited//DTD Direct Web Remoting 3.0//EN\" \"http://getahead.org/dwr//dwr30.dtd\">");
 		sb.append("<dwr>");
 		sb.append("<allow>");
 		sb.append("<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\">");
@@ -44,17 +50,20 @@ public class PluginMergerTest extends TestBase {
 				"<!-- END PLUGINS -->", "<!-- BEGIN PLUGIN:" + name + " -->", "<!-- END PLUGIN:" + name + " -->", dwr,
 				overrideMap, "<!-- BEGIN OVERRIDE:" + name, " END OVERRIDE:" + name + " -->", "<!-- BEGIN OVERRIDE");
 
-		String newline = System.getProperty("line.separator");
 
-		String comentedPart = "<!-- BEGIN OVERRIDE:override-test"
-				+ newline + "<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\"><param name=\"class\" value=\"com.dotmarketing.portlets.user.ajax.UserAjax\"/></create>"
-				+ newline + " END OVERRIDE:override-test -->";
+		sb = new StringBuilder("<!-- BEGIN OVERRIDE:override-test");
+		sb.append(newline).append("<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\"><param name=\"class\" value=\"com.dotmarketing.portlets.user.ajax.UserAjax\"/></create>");
+		sb.append(newline).append(" END OVERRIDE:override-test -->");
 
-		String newPart = "<!-- BEGIN PLUGIN:override-test -->"
-				+ newline + "<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\">"
-				+ newline + "<param name=\"class\" value=\"com.arqiva.plugins.ajax.ArqivaUserAjax\"/>"
-				+ newline + "</create>"
-				+ newline + "<!-- END PLUGIN:override-test -->";
+		String comentedPart = sb.toString();
+
+		sb = new StringBuilder("<!-- BEGIN PLUGIN:override-test -->");
+		sb.append(newline).append("<create creator=\"new\" javascript=\"UserAjax\" scope=\"application\">");
+		sb.append(newline).append("<param name=\"class\" value=\"com.arqiva.plugins.ajax.ArqivaUserAjax\"/>");
+		sb.append(newline).append("</create>");
+		sb.append(newline).append("<!-- END PLUGIN:override-test -->");
+
+		String newPart = sb.toString();
 
 		assertTrue(fileContent.toString().contains(comentedPart));
 		assertTrue(fileContent.toString().contains(newPart));
